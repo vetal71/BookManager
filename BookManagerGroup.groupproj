@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{D89BF80E-9654-4629-B987-17B9A538F114}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="BookManager.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="BookManager">
+        <MSBuild Projects="BookManager.dproj"/>
+    </Target>
+    <Target Name="BookManager:Clean">
+        <MSBuild Projects="BookManager.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BookManager:Make">
+        <MSBuild Projects="BookManager.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="BookManager"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="BookManager:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="BookManager:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
