@@ -3,9 +3,13 @@ program BookManager;
 uses
   Vcl.Forms,
   BM_FMain in 'BM_FMain.pas' {frmMain},
-  Entities in 'Entities.pas',
+  Entities.Book in 'Entities.Book.pas',
   SYS_uCommon in 'SYS_uCommon.pas',
-  SYS_uConnectionModule in 'SYS_uConnectionModule.pas' {SQLiteConnection: TDataModule};
+  SYS_uConnectionModule in 'SYS_uConnectionModule.pas' {SQLiteConnection: TDataModule},
+  FolderLister in 'FolderLister.pas',
+  Entities.Category in 'Entities.Category.pas',
+  LoggerProConfig in 'LoggerProConfig.pas',
+  MainController in 'MainController.pas';
 
 {$R *.res}
 

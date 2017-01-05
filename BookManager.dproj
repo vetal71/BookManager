@@ -91,13 +91,17 @@
             <Form>frmMain</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="Entities.pas"/>
+        <DCCReference Include="Entities.Book.pas"/>
         <DCCReference Include="SYS_uCommon.pas"/>
         <DCCReference Include="SYS_uConnectionModule.pas">
             <Form>SQLiteConnection</Form>
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
+        <DCCReference Include="FolderLister.pas"/>
+        <DCCReference Include="Entities.Category.pas"/>
+        <DCCReference Include="LoggerProConfig.pas"/>
+        <DCCReference Include="MainController.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
