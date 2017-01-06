@@ -1,7 +1,7 @@
-unit MainController;
+unit MainControllerOld;
 
 interface
-
+(*
 uses
   Aurelius.Drivers.Interfaces,
   SYS_uConnectionModule,
@@ -14,9 +14,9 @@ type
     class procedure SynhronizeLibrary;
     class function DBConnection: IDBConnection;
   end;
-
+*)
 implementation
-
+(*
 uses
   FolderLister, Entities.Category, Entities.Book;
 
@@ -53,5 +53,5 @@ begin
     FldLister.Free;
   end;
 end;
-
+*)
 end.

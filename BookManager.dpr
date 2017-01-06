@@ -2,21 +2,25 @@ program BookManager;
 
 uses
   Vcl.Forms,
-  BM_FMain in 'BM_FMain.pas' {frmMain},
   Entities.Book in 'Entities.Book.pas',
-  SYS_uCommon in 'SYS_uCommon.pas',
-  SYS_uConnectionModule in 'SYS_uConnectionModule.pas' {SQLiteConnection: TDataModule},
-  FolderLister in 'FolderLister.pas',
+  Common.FileUtils in 'Common.FileUtils.pas',
+  Controllers.MainController in 'Controllers.MainController.pas' {SQLiteConnection: TDataModule},
+  Utilities.FolderLister in 'Utilities.FolderLister.pas',
   Entities.Category in 'Entities.Category.pas',
   LoggerProConfig in 'LoggerProConfig.pas',
-  MainController in 'MainController.pas';
+  MainControllerOld in 'MainControllerOld.pas',
+  Controllers.BookController in 'Controllers.BookController.pas',
+  Common.DBConnection in 'Common.DBConnection.pas',
+  MainForm in 'View\MainForm.pas' {frmMain},
+  SQLMonitoring in 'View\SQLMonitoring.pas' {frmSQLMonitoring},
+  BaseForm in 'View\BaseForm.pas' {frmBase};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfrmBase, frmBase);
   Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TSQLiteConnection, SQLiteConnection);
   Application.Run;
 end.

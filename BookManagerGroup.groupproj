@@ -6,6 +6,9 @@
         <Projects Include="BookManager.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="D:\Embarcadero\Studio\18.0\Components\TMS Aurelius\Demos\MusicLibrary\VCL\MusicLibraryVCL.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -23,14 +26,23 @@
     <Target Name="BookManager:Make">
         <MSBuild Projects="BookManager.dproj" Targets="Make"/>
     </Target>
+    <Target Name="MusicLibraryVCL">
+        <MSBuild Projects="D:\Embarcadero\Studio\18.0\Components\TMS Aurelius\Demos\MusicLibrary\VCL\MusicLibraryVCL.dproj"/>
+    </Target>
+    <Target Name="MusicLibraryVCL:Clean">
+        <MSBuild Projects="D:\Embarcadero\Studio\18.0\Components\TMS Aurelius\Demos\MusicLibrary\VCL\MusicLibraryVCL.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MusicLibraryVCL:Make">
+        <MSBuild Projects="D:\Embarcadero\Studio\18.0\Components\TMS Aurelius\Demos\MusicLibrary\VCL\MusicLibraryVCL.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="BookManager"/>
+        <CallTarget Targets="BookManager;MusicLibraryVCL"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="BookManager:Clean"/>
+        <CallTarget Targets="BookManager:Clean;MusicLibraryVCL:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="BookManager:Make"/>
+        <CallTarget Targets="BookManager:Make;MusicLibraryVCL:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -1,10 +1,10 @@
-unit BM_FMain;
+unit MainForm;
 
 interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, dxSkinsCore, dxBevel, cxGraphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, dxSkinsCore, dxBevel, cxGraphics, BaseForm,
   cxControls, cxLookAndFeels, cxLookAndFeelPainters, dxSkinMetropolis,
   dxSkinsdxStatusBarPainter, dxSkinsdxBarPainter, dxSkinsForm, System.ImageList,
   Vcl.ImgList, dxBar, cxClasses, dxStatusBar,
@@ -12,16 +12,16 @@ uses
   Aurelius.Engine.DatabaseManager,
   Aurelius.Engine.ObjectManager,
   Entities.Book, Entities.Category,
-  SYS_uConnectionModule, Vcl.Menus, Vcl.StdCtrls, cxButtons, System.Actions,
-  Vcl.ActnList, cxSplitter, Vcl.ExtCtrls, Data.DB, Aurelius.Bind.Dataset;
+  Vcl.Menus, Vcl.StdCtrls, cxButtons, System.Actions,
+  Vcl.ActnList, cxSplitter, Vcl.ExtCtrls,
+  SQLMonitoring;
 
 type
-  TfrmMain = class(TForm)
+  TfrmMain = class(TfrmBase)
     brMain: TdxBarManager;
     brmMainToolbar: TdxBar;
     btnRefreshLib: TdxBarLargeButton;
     sbMain: TdxStatusBar;
-    sknMain: TdxSkinController;
     bvlMain: TdxBevel;
     btnTest: TdxBarLargeButton;
     brmMainMenu: TdxBar;
@@ -34,7 +34,6 @@ type
     ilSmall: TcxImageList;
     actRefreshLibrary: TAction;
     actExit: TAction;
-    AureliusDataset1: TAureliusDataset;
     pnlLeft: TPanel;
     MainSplitter: TcxSplitter;
     pnlRight: TPanel;
@@ -55,7 +54,7 @@ var
 implementation
 
 uses
-  LoggerProConfig, MainController;
+  LoggerProConfig, Common.DBConnection;
 
 {$R *.dfm}
 
@@ -67,7 +66,7 @@ end;
 procedure TfrmMain.actRefreshLibraryExecute(Sender: TObject);
 begin
   // Обновление библиотеки
-  TController.SynhronizeLibrary;
+  //TController.SynhronizeLibrary;
 end;
 
 procedure TfrmMain.btnCreateObjectClick(Sender: TObject);
@@ -100,7 +99,9 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
-  FDBConnection := TController.DBConnection;
+// Добавляем листенер для SQL
+  TDBConnection.GetInstance.AddCommandListener(TfrmSqlMonitoring.GetInstance);
+
   FDBManager    := TDatabaseManager.Create(FDBConnection);
   try
     FDBManager.UpdateDatabase;

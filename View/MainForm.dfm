@@ -1,21 +1,15 @@
-object frmMain: TfrmMain
-  Left = 0
-  Top = 0
+inherited frmMain: TfrmMain
   Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075
   ClientHeight = 594
   ClientWidth = 930
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
   Font.Height = -12
-  Font.Name = 'Segoe UI'
-  Font.Style = []
-  OldCreateOrder = False
   ShowHint = True
   OnCreate = FormCreate
+  ExplicitWidth = 946
+  ExplicitHeight = 632
   PixelsPerInch = 96
   TextHeight = 15
-  object bvlMain: TdxBevel
+  object bvlMain: TdxBevel [0]
     Left = 357
     Top = 75
     Width = 573
@@ -28,7 +22,7 @@ object frmMain: TfrmMain
     ExplicitWidth = 289
     ExplicitHeight = 177
   end
-  object sbMain: TdxStatusBar
+  object sbMain: TdxStatusBar [1]
     Left = 0
     Top = 574
     Width = 930
@@ -49,22 +43,22 @@ object frmMain: TfrmMain
     Font.Name = 'Segoe UI'
     Font.Style = []
   end
-  object pnlLeft: TPanel
+  object pnlLeft: TPanel [2]
     Left = 0
     Top = 75
     Width = 345
     Height = 499
     Align = alLeft
     BevelOuter = bvLowered
-    TabOrder = 4
+    TabOrder = 2
   end
-  object MainSplitter: TcxSplitter
+  object MainSplitter: TcxSplitter [3]
     Left = 345
     Top = 75
     Width = 12
     Height = 499
   end
-  object pnlRight: TPanel
+  object pnlRight: TPanel [4]
     Left = 357
     Top = 75
     Width = 573
@@ -539,12 +533,6 @@ object frmMain: TfrmMain
       ShowCaption = False
     end
   end
-  object sknMain: TdxSkinController
-    NativeStyle = False
-    SkinName = 'Metropolis'
-    Left = 381
-    Top = 192
-  end
   object acList: TActionList
     Images = ilSmall
     Left = 255
@@ -642,10 +630,5 @@ object frmMain: TfrmMain
           000000000000000000000000000000000002432911747F4D1FE1371F0D740000
           0002000000000000000000000000000000000000000000000000}
       end>
-  end
-  object AureliusDataset1: TAureliusDataset
-    FieldDefs = <>
-    Left = 520
-    Top = 520
   end
 end
