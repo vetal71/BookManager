@@ -13,7 +13,8 @@ uses
   Common.DBConnection in 'Common.DBConnection.pas',
   MainForm in 'View\MainForm.pas' {frmMain},
   SQLMonitoring in 'View\SQLMonitoring.pas' {frmSQLMonitoring},
-  BaseForm in 'View\BaseForm.pas' {frmBase};
+  BaseForm in 'View\BaseForm.pas' {frmBase},
+  Controllers.CategoryController in 'Controllers.CategoryController.pas';
 
 {$R *.res}
 

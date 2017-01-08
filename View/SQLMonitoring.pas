@@ -7,28 +7,46 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, cxGraphics, cxControls, cxLookAndFeels, BaseForm,
   cxLookAndFeelPainters, cxContainer, cxEdit, dxSkinsCore, dxSkinMetropolis,
   cxTextEdit, cxMemo, dxBevel, cxClasses, dxSkinsForm, Vcl.Menus, Vcl.StdCtrls,
-  cxButtons, Vcl.ExtCtrls;
+  cxButtons, Vcl.ExtCtrls,
+  System.Generics.Collections,
+  Aurelius.Drivers.Interfaces,
+  Aurelius.Commands.Listeners;
 
 type
-  TfrmSQLMonitoring = class(TfrmBase)
+  TfrmSQLMonitoring = class(TfrmBase, ICommandExecutionListener)
     mmoLog: TcxMemo;
     pnlButton: TPanel;
     btnExit: TcxButton;
     btnClear: TcxButton;
+    procedure btnExitClick(Sender: TObject);
   private
-    FInstance: TfrmSQLMonitoring;
+    class var
+      FInstance: TfrmSqlMonitoring;
+    procedure ExecutingCommand(SQL: string; Params: TEnumerable<TDBParam>);
   public
     class function GetInstance: TfrmSqlMonitoring;
   end;
 
-var
-  frmSQLMonitoring: TfrmSQLMonitoring;
-
 implementation
+
+uses
+  Common.DBConnection;
 
 {$R *.dfm}
 
 { TfrmSQLMonitoring }
+
+procedure TfrmSQLMonitoring.btnExitClick(Sender: TObject);
+begin
+  Hide;
+end;
+
+procedure TfrmSQLMonitoring.ExecutingCommand(SQL: string;
+  Params: TEnumerable<TDBParam>);
+begin
+  TDBConnection.AddLines(mmoLog.Lines, SQL, Params);
+  Application.ProcessMessages;
+end;
 
 class function TfrmSQLMonitoring.GetInstance: TfrmSqlMonitoring;
 begin
