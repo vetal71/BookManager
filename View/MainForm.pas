@@ -14,7 +14,10 @@ uses
   Entities.Book, Entities.Category,
   Vcl.Menus, Vcl.StdCtrls, cxButtons, System.Actions,
   Vcl.ActnList, cxSplitter, Vcl.ExtCtrls,
-  SQLMonitoring;
+  SQLMonitoring, cxStyles, dxSkinscxPCPainter, cxCustomData, cxFilter, cxData,
+  cxDataStorage, cxEdit, cxNavigator, Data.DB, cxDBData, cxContainer, cxListBox,
+  cxDBNavigator, cxGridLevel, cxGridCustomView, cxGridCustomTableView,
+  cxGridTableView, cxGridDBTableView, cxGrid, Aurelius.Bind.Dataset;
 
 type
   TfrmMain = class(TfrmBase)
@@ -37,6 +40,14 @@ type
     pnlLeft: TPanel;
     MainSplitter: TcxSplitter;
     pnlRight: TPanel;
+    BooksDataSet: TAureliusDataset;
+    dsBooks: TDataSource;
+    grdBooksView: TcxGridDBTableView;
+    grdBooksLevel: TcxGridLevel;
+    grdBooks: TcxGrid;
+    cxDBNavigator1: TcxDBNavigator;
+    cxNavigator1: TcxNavigator;
+    lstCategories: TcxListBox;
     procedure FormCreate(Sender: TObject);
     procedure btnCreateObjectClick(Sender: TObject);
     procedure actExitExecute(Sender: TObject);

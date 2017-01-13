@@ -51,6 +51,43 @@ inherited frmMain: TfrmMain
     Align = alLeft
     BevelOuter = bvLowered
     TabOrder = 2
+    object cxNavigator1: TcxNavigator
+      Left = 1
+      Top = 1
+      Width = 341
+      Height = 25
+      Buttons.CustomButtons = <>
+      Buttons.First.Visible = False
+      Buttons.PriorPage.Visible = False
+      Buttons.Prior.Visible = False
+      Buttons.Next.Visible = False
+      Buttons.NextPage.Visible = False
+      Buttons.Last.Visible = False
+      Buttons.Append.Enabled = False
+      Buttons.Append.Visible = False
+      Buttons.Post.Visible = False
+      Buttons.Cancel.Visible = False
+      Buttons.Refresh.Visible = False
+      Buttons.SaveBookmark.Visible = False
+      Buttons.GotoBookmark.Visible = False
+      Buttons.Filter.Visible = False
+      Align = alTop
+      TabOrder = 0
+    end
+    object lstCategories: TcxListBox
+      AlignWithMargins = True
+      Left = 4
+      Top = 29
+      Width = 337
+      Height = 466
+      Align = alClient
+      ItemHeight = 15
+      TabOrder = 1
+      ExplicitLeft = 16
+      ExplicitTop = 48
+      ExplicitWidth = 121
+      ExplicitHeight = 97
+    end
   end
   object MainSplitter: TcxSplitter [3]
     Left = 345
@@ -66,6 +103,43 @@ inherited frmMain: TfrmMain
     Align = alClient
     BevelOuter = bvLowered
     TabOrder = 7
+    object grdBooks: TcxGrid
+      AlignWithMargins = True
+      Left = 4
+      Top = 29
+      Width = 565
+      Height = 466
+      Align = alClient
+      TabOrder = 0
+      ExplicitTop = 88
+      ExplicitHeight = 407
+      object grdBooksView: TcxGridDBTableView
+        Navigator.Buttons.CustomButtons = <>
+        DataController.Summary.DefaultGroupSummaryItems = <>
+        DataController.Summary.FooterSummaryItems = <>
+        DataController.Summary.SummaryGroups = <>
+        OptionsView.CellEndEllipsis = True
+        OptionsView.CellAutoHeight = True
+        OptionsView.GroupByBox = False
+        OptionsView.HeaderEndEllipsis = True
+      end
+      object grdBooksLevel: TcxGridLevel
+        GridView = grdBooksView
+      end
+    end
+    object cxDBNavigator1: TcxDBNavigator
+      Left = 1
+      Top = 1
+      Width = 557
+      Height = 25
+      Buttons.CustomButtons = <>
+      DataSource = dsBooks
+      Align = alTop
+      TabOrder = 1
+      ExplicitLeft = 16
+      ExplicitTop = 8
+      ExplicitWidth = 257
+    end
   end
   object brMain: TdxBarManager
     Font.Charset = DEFAULT_CHARSET
@@ -630,5 +704,15 @@ inherited frmMain: TfrmMain
           000000000000000000000000000000000002432911747F4D1FE1371F0D740000
           0002000000000000000000000000000000000000000000000000}
       end>
+  end
+  object BooksDataSet: TAureliusDataset
+    FieldDefs = <>
+    Left = 416
+    Top = 192
+  end
+  object dsBooks: TDataSource
+    DataSet = BooksDataSet
+    Left = 493
+    Top = 192
   end
 end

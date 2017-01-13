@@ -9,12 +9,13 @@ uses
   Entities.Category in 'Entities.Category.pas',
   LoggerProConfig in 'LoggerProConfig.pas',
   MainControllerOld in 'MainControllerOld.pas',
-  Controllers.BookController in 'Controllers.BookController.pas',
+  Controllers.EditBookController in 'Controllers.EditBookController.pas',
   Common.DBConnection in 'Common.DBConnection.pas',
   MainForm in 'View\MainForm.pas' {frmMain},
   SQLMonitoring in 'View\SQLMonitoring.pas' {frmSQLMonitoring},
   BaseForm in 'View\BaseForm.pas' {frmBase},
-  Controllers.CategoryController in 'Controllers.CategoryController.pas';
+  Controllers.CategoryController in 'Controllers.CategoryController.pas',
+  Controllers.EditCategoryController in 'Controllers.EditCategoryController.pas';
 
 {$R *.res}
 

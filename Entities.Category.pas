@@ -16,7 +16,8 @@ type
     property Id: Integer  read FId write FId;
     property CategoryName: string  read FCategoryName write FCategoryName;
   public
-    constructor Create(ACategoryName: string);
+    constructor Create; overload;
+    constructor Create(ACategoryName: string); overload;
   end;
 
 implementation
