@@ -3,7 +3,7 @@ unit Utilities.FolderLister;
 interface
 
 uses
-  SYS_uCommon,
+  Common.Utils,
   System.Classes,
   System.Generics.Collections,
   Vcl.Dialogs,

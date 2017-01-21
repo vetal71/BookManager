@@ -7,13 +7,13 @@ object frmBase: TfrmBase
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -15
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 20
   object sknMain: TdxSkinController
     NativeStyle = False
     SkinName = 'Metropolis'

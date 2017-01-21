@@ -11,6 +11,7 @@ uses
   Aurelius.Engine.ObjectManager,
   Aurelius.Engine.DatabaseManager,
   Aurelius.Drivers.SQLite,
+  Aurelius.Schema.SQLite,
   Aurelius.Sql.SQLite;
 
 type
@@ -198,7 +199,7 @@ end;
 
 function TDBConnection.DefaultSQLiteDatabase: string;
 begin
-  Result := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'aurelius.sqlite';
+  Result := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'Simple.db';
 end;
 
 function TDBConnection.HasConnection: boolean;

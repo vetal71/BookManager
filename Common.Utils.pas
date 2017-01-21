@@ -1,11 +1,13 @@
-unit Common.FileUtils;
+unit Common.Utils;
 
 interface
 
 uses
-  System.Classes, System.SysUtils;
+  System.Classes, System.SysUtils, Vcl.Forms, Winapi.Windows;
 
 procedure FindAllFiles(FilesList: TStringList; StartDir, FileMask: string);
+
+procedure ShowError(AMsg: string);
 
 implementation
 
@@ -38,6 +40,11 @@ begin
   for i := 0 to Pred(DirList.Count) do
     FindAllFiles( FilesList, StartDir + DirList[i], FileMask );
   DirList.Free;
+end;
+
+procedure ShowError(AMsg: string);
+begin
+  Application.MessageBox(PChar(AMsg), 'Ошибка', MB_OK + MB_ICONSTOP);
 end;
 
 end.

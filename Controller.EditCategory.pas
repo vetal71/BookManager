@@ -1,11 +1,11 @@
-unit Controllers.EditCategoryController;
+unit Controller.EditCategory;
 
 interface
 
 uses
   Generics.Collections,
   Aurelius.Engine.ObjectManager,
-  Entities.Category;
+  Model.Entities;
 
 type
   TEditCategoryController = class

@@ -1,10 +1,11 @@
-unit SQLMonitoring;
+unit Form.SQLMonitoring;
 
 interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, cxGraphics, cxControls, cxLookAndFeels, BaseForm,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, cxGraphics, cxControls, cxLookAndFeels,
+  Form.BaseForm,
   cxLookAndFeelPainters, cxContainer, cxEdit, dxSkinsCore, dxSkinMetropolis,
   cxTextEdit, cxMemo, dxBevel, cxClasses, dxSkinsForm, Vcl.Menus, Vcl.StdCtrls,
   cxButtons, Vcl.ExtCtrls,

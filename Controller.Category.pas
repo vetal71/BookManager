@@ -1,11 +1,11 @@
-unit Controllers.CategoryController;
+unit Controller.Category;
 
 interface
 
 uses
   System.Generics.Collections,
   Aurelius.Engine.ObjectManager,
-  Entities.Category;
+  Model.Entities;
 
 type
   TCategoryController = class
@@ -34,7 +34,7 @@ end;
 procedure TCategoryController.DeleteCategory(ACategory: TCategory);
 begin
   if not FManager.IsAttached(ACategory) then
-    ACategory := FManager.Find<TCategory>(ACategory.Id);
+    ACategory := FManager.Find<TCategory>(ACategory.CategoryID);
   FManager.Remove(ACategory);
 end;
 

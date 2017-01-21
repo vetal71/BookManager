@@ -1,9 +1,9 @@
-unit Controllers.EditBookController;
+unit Controller.EditBook;
 
 interface
 
 uses
-  Entities.Book,
+  Model.Entities,
   Aurelius.Engine.ObjectManager;
 
 type

@@ -4,17 +4,18 @@ inherited frmSQLMonitoring: TfrmSQLMonitoring
   ClientHeight = 378
   ClientWidth = 525
   ExplicitWidth = 531
-  ExplicitHeight = 407
+  ExplicitHeight = 406
   PixelsPerInch = 96
   TextHeight = 13
   object mmoLog: TcxMemo [0]
-    AlignWithMargins = True
-    Left = 3
-    Top = 3
+    Left = 0
+    Top = 0
     Align = alClient
     TabOrder = 0
-    Height = 326
-    Width = 519
+    ExplicitLeft = 3
+    ExplicitTop = 3
+    Height = 332
+    Width = 525
   end
   object pnlButton: TPanel [1]
     Left = 0
