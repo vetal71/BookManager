@@ -3,7 +3,6 @@ program BookManager;
 uses
   Vcl.Forms,
   Common.Utils in 'Common.Utils.pas',
-  Utilities.FolderLister in 'Utilities.FolderLister.pas',
   Model.Entities in 'Model.Entities.pas',
   Controller.EditBook in 'Controller.EditBook.pas',
   Common.DBConnection in 'Common.DBConnection.pas',
@@ -13,7 +12,9 @@ uses
   Controller.Category in 'Controller.Category.pas',
   Controller.EditCategory in 'Controller.EditCategory.pas',
   Form.BaseEditForm in 'Form.BaseEditForm.pas' {frmBaseEditor},
-  Form.EditCategory in 'Form.EditCategory.pas' {frmEditCategory};
+  Form.EditCategory in 'Form.EditCategory.pas' {frmEditCategory},
+  Form.EditBook in 'Form.EditBook.pas' {frmEditBook},
+  Controller.Book in 'Controller.Book.pas';
 
 {$R *.res}
 
@@ -21,7 +22,5 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TfrmBaseEditor, frmBaseEditor);
-  Application.CreateForm(TfrmEditCategory, frmEditCategory);
   Application.Run;
 end.

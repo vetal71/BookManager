@@ -2,7 +2,6 @@ inherited frmMain: TfrmMain
   Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075
   ClientHeight = 681
   ClientWidth = 1374
-  Font.Height = -15
   ShowHint = True
   WindowState = wsMaximized
   OnCreate = FormCreate
@@ -13,9 +12,9 @@ inherited frmMain: TfrmMain
   TextHeight = 20
   object bvlMain: TdxBevel [0]
     Left = 461
-    Top = 75
+    Top = 71
     Width = 913
-    Height = 586
+    Height = 509
     Align = alClient
     LookAndFeel.NativeStyle = False
     Shape = dxbsFrame
@@ -32,10 +31,15 @@ inherited frmMain: TfrmMain
     Panels = <
       item
         PanelStyleClassName = 'TdxStatusBarTextPanelStyle'
-        Width = 500
+        Width = 400
       end
       item
         PanelStyleClassName = 'TdxStatusBarTextPanelStyle'
+        Width = 250
+      end
+      item
+        PanelStyleClassName = 'TdxStatusBarTextPanelStyle'
+        Width = 200
       end>
     PaintStyle = stpsUseLookAndFeel
     LookAndFeel.NativeStyle = False
@@ -47,9 +51,9 @@ inherited frmMain: TfrmMain
   end
   object pnlLeft: TPanel [2]
     Left = 0
-    Top = 75
+    Top = 71
     Width = 449
-    Height = 586
+    Height = 509
     Align = alLeft
     BevelOuter = bvLowered
     TabOrder = 2
@@ -76,6 +80,7 @@ inherited frmMain: TfrmMain
         Hint = #1056#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = 'btnEditCategory'
         ImageIndex = 2
+        OnClick = btnEditCategoryClick
       end
       object btnDelCategory: TToolButton
         Left = 46
@@ -83,12 +88,14 @@ inherited frmMain: TfrmMain
         Hint = #1059#1076#1072#1083#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = 'btnDelCategory'
         ImageIndex = 1
+        OnClick = btnDelCategoryClick
       end
       object btnRefresh: TToolButton
         Left = 69
         Top = 0
         Caption = 'btnRefreshCategory'
         ImageIndex = 3
+        OnClick = btnRefreshClick
       end
     end
     object lstCategories: TcxDBTreeList
@@ -96,15 +103,16 @@ inherited frmMain: TfrmMain
       Left = 4
       Top = 26
       Width = 441
-      Height = 556
+      Height = 479
       Align = alClient
       Bands = <
         item
         end>
       DataController.DataSource = dsCategories
-      DataController.ParentField = 'ParentID'
+      DataController.ParentField = 'Parent'
       DataController.KeyField = 'Self'
       Navigator.Buttons.CustomButtons = <>
+      OptionsSelection.CellSelect = False
       RootValue = -1
       TabOrder = 1
       object lstCategoriesCategoryID: TcxDBTreeListColumn
@@ -122,7 +130,7 @@ inherited frmMain: TfrmMain
         Caption.AlignHorz = taCenter
         Caption.Text = #1050#1072#1090#1077#1075#1086#1088#1080#1103
         DataBinding.FieldName = 'CategoryName'
-        Width = 300
+        Width = 336
         Position.ColIndex = 1
         Position.RowIndex = 0
         Position.BandIndex = 0
@@ -133,15 +141,15 @@ inherited frmMain: TfrmMain
   end
   object MainSplitter: TcxSplitter [3]
     Left = 449
-    Top = 75
+    Top = 71
     Width = 12
-    Height = 586
+    Height = 509
   end
   object pnlRight: TPanel [4]
     Left = 461
-    Top = 75
+    Top = 71
     Width = 913
-    Height = 586
+    Height = 509
     Align = alClient
     BevelOuter = bvLowered
     TabOrder = 7
@@ -150,7 +158,7 @@ inherited frmMain: TfrmMain
       Left = 4
       Top = 26
       Width = 905
-      Height = 556
+      Height = 479
       Align = alClient
       TabOrder = 0
       object grdBooksView: TcxGridDBTableView
@@ -187,19 +195,13 @@ inherited frmMain: TfrmMain
           DataBinding.FieldName = 'BookName'
           GroupSummaryAlignment = taCenter
           HeaderAlignmentHorz = taCenter
-          Width = 300
+          Width = 401
         end
         object grdBooksViewFILE_LINK: TcxGridDBColumn
           Caption = #1055#1091#1090#1100' '#1082' '#1092#1072#1081#1083#1091
           DataBinding.FieldName = 'BookLink'
           HeaderAlignmentHorz = taCenter
-          Width = 350
-        end
-        object grdBooksViewCATEGORYCATEGORY: TcxGridDBColumn
-          Caption = #1050#1072#1090#1077#1075#1086#1088#1080#1103
-          DataBinding.FieldName = 'Category.CategoryName'
-          HeaderAlignmentHorz = taCenter
-          Width = 150
+          Width = 397
         end
       end
       object grdBooksLevel: TcxGridLevel
@@ -221,6 +223,7 @@ inherited frmMain: TfrmMain
         Hint = #1044#1086#1073#1072#1074#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = 'btnAdd'
         ImageIndex = 0
+        OnClick = btnAddBookClick
       end
       object btnEditBook: TToolButton
         Left = 23
@@ -228,6 +231,7 @@ inherited frmMain: TfrmMain
         Hint = #1056#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = 'btnEdit'
         ImageIndex = 2
+        OnClick = btnEditBookClick
       end
       object btnDelBook: TToolButton
         Left = 46
@@ -235,14 +239,25 @@ inherited frmMain: TfrmMain
         Hint = #1059#1076#1072#1083#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = 'btnDel'
         ImageIndex = 1
+        OnClick = btnDelBookClick
       end
       object btnRefreshBook: TToolButton
         Left = 69
         Top = 0
         Caption = 'btnRefreshBook'
         ImageIndex = 3
+        OnClick = btnRefreshBookClick
       end
     end
+  end
+  object aiProgress: TdxActivityIndicator [5]
+    Left = 0
+    Top = 580
+    Width = 1374
+    Height = 81
+    Align = alBottom
+    PropertiesClassName = 'TdxActivityIndicatorHorizontalDotsProperties'
+    Visible = False
   end
   inherited sknMain: TdxSkinController
     Top = 120
@@ -266,7 +281,7 @@ inherited frmMain: TfrmMain
     DockControlHeights = (
       0
       0
-      75
+      71
       0)
     object brmMainToolbar: TdxBar
       AllowClose = False
@@ -291,16 +306,12 @@ inherited frmMain: TfrmMain
         item
           BeginGroup = True
           Visible = True
-          ItemName = 'btnExit'
+          ItemName = 'btnSQLMonitor'
         end
         item
           BeginGroup = True
           Visible = True
-          ItemName = 'btnSQLMonitor'
-        end
-        item
-          Visible = True
-          ItemName = 'btnTest'
+          ItemName = 'btnExit'
         end>
       MultiLine = True
       OneOnRow = True
@@ -485,7 +496,6 @@ inherited frmMain: TfrmMain
       Category = 0
       Hint = #1058#1077#1089#1090#1080#1088#1086#1074#1072#1085#1080#1077' '#1092#1091#1085#1082#1094#1080#1086#1085#1072#1083#1072
       Visible = ivAlways
-      OnClick = btnCreateObjectClick
     end
     object bsiFile: TdxBarSubItem
       Caption = #1060#1072#1081#1083
@@ -1291,6 +1301,7 @@ inherited frmMain: TfrmMain
   end
   object BooksDS: TAureliusDataset
     FieldDefs = <>
+    BeforeOpen = BooksDSBeforeOpen
     Left = 416
     Top = 313
   end

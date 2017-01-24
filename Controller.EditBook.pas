@@ -4,6 +4,7 @@ interface
 
 uses
   Model.Entities,
+  System.Generics.Collections,
   Aurelius.Engine.ObjectManager;
 
 type
@@ -14,10 +15,11 @@ type
   public
     procedure SaveBook(Book: TBook);
     procedure Load(BookID: Variant);
+    function GetCategories: TList<TCategory>;
   public
     constructor Create;
     destructor Destroy; override;
-  private
+  public
     property Book: TBook read FBook;
   end;
 
@@ -41,6 +43,11 @@ begin
     FBook.Free;
   FManager.Free;
   inherited;
+end;
+
+function TEditBookController.GetCategories: TList<TCategory>;
+begin
+  Result := FManager.FindAll<TCategory>;
 end;
 
 procedure TEditBookController.Load(BookID: Variant);

@@ -3,7 +3,6 @@ inherited frmBaseEditor: TfrmBaseEditor
   Caption = 'frmBaseEditor'
   ClientHeight = 278
   ClientWidth = 632
-  Font.Height = -15
   ExplicitWidth = 638
   ExplicitHeight = 306
   PixelsPerInch = 96
@@ -41,7 +40,6 @@ inherited frmBaseEditor: TfrmBaseEditor
       Height = 30
       Anchors = [akTop, akRight, akBottom]
       Caption = 'OK'
-      ModalResult = 1
       TabOrder = 0
     end
     object btnCancel: TcxButton
@@ -51,8 +49,8 @@ inherited frmBaseEditor: TfrmBaseEditor
       Height = 30
       Anchors = [akTop, akRight, akBottom]
       Caption = #1054#1090#1084#1077#1085#1072
-      ModalResult = 2
       TabOrder = 1
+      OnClick = btnCancelClick
     end
   end
   object pnlHeader: TPanel [3]
@@ -75,8 +73,6 @@ inherited frmBaseEditor: TfrmBaseEditor
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitTop = 144
-    ExplicitHeight = 95
   end
   inherited sknMain: TdxSkinController
     Left = 221

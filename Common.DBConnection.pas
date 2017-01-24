@@ -18,9 +18,11 @@ type
   TDBConnection = class sealed
   private
     class var FInstance: TDBConnection;
+    class var FDBName: string;
   private
     FConnection: IDBConnection;
     FListeners: TList<ICommandExecutionListener>;
+
     procedure PrivateCreate;
     procedure PrivateDestroy;
 
@@ -33,10 +35,12 @@ type
     procedure AddListeners(AManager: TAbstractManager);
   public
     class function GetInstance: TDBConnection;
+    class function GetDBName: string;
     procedure AddCommandListener(Listener: ICommandExecutionListener);
     class procedure AddLines(List: TStrings; SQL: string; Params: TEnumerable<TDBParam>);
 
     property Connection: IDBConnection read GetConnection;
+
     function HasConnection: boolean;
     function CreateObjectManager: TObjectManager;
     function GetNewDatabaseManager: TDatabaseManager;
@@ -164,6 +168,11 @@ begin
     Result.Connect;
 end;
 
+class function TDBConnection.GetDBName: string;
+begin
+  Result := FDBName;
+end;
+
 class function TDBConnection.GetInstance: TDBConnection;
 begin
   if FInstance = nil then
@@ -194,6 +203,7 @@ var
 begin
   Result := nil;
   SQLiteFile := AIniFile.ReadString('Config', 'SQLiteFile', '');
+  FDBName := SQLiteFile;
   Result := TSQLiteNativeConnectionAdapter.Create(SQLiteFile);
 end;
 

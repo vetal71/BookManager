@@ -18,6 +18,7 @@ type
   public
     procedure SaveCategory(Category: TCategory);
     procedure Load(CategoryID: Variant);
+    function GetCategories: TList<TCategory>;
   public
     property Category: TCategory read FCategory;
   end;
@@ -41,6 +42,11 @@ begin
     FCategory.Free;
   FManager.Free;
   inherited;
+end;
+
+function TEditCategoryController.GetCategories: TList<TCategory>;
+begin
+  Result := FManager.FindAll<TCategory>;
 end;
 
 procedure TEditCategoryController.Load(CategoryID: Variant);

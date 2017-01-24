@@ -20,7 +20,9 @@ uses
   cxGridTableView, cxGridDBTableView, cxGrid, Aurelius.Bind.Dataset,
   cxCustomData, cxFilter, cxData, cxDBEdit, Vcl.ComCtrls, Vcl.ToolWin, cxTL,
   cxTLdxBarBuiltInMenu, cxInplaceContainer, cxTLData, cxDBTL, cxMaskEdit,
-  Vcl.Grids, Vcl.DBGrids;
+  Vcl.Grids, Vcl.DBGrids,
+  Model.Entities,
+  Controller.Category, dxActivityIndicator;
 
 type
   TfrmMain = class(TfrmBase)
@@ -55,7 +57,6 @@ type
     grdBooksViewID: TcxGridDBColumn;
     grdBooksViewBOOK_NAME: TcxGridDBColumn;
     grdBooksViewFILE_LINK: TcxGridDBColumn;
-    grdBooksViewCATEGORYCATEGORY: TcxGridDBColumn;
     tbCategoryEdit: TToolBar;
     btnAddCategory: TToolButton;
     ilEdit: TcxImageList;
@@ -72,15 +73,30 @@ type
     lstCategoriesCategoryID: TcxDBTreeListColumn;
     btnRefresh: TToolButton;
     btnRefreshBook: TToolButton;
+    aiProgress: TdxActivityIndicator;
     procedure FormCreate(Sender: TObject);
-    procedure btnCreateObjectClick(Sender: TObject);
     procedure actExitExecute(Sender: TObject);
     procedure actRefreshLibraryExecute(Sender: TObject);
     procedure actSQLMonitorExecute(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnAddCategoryClick(Sender: TObject);
+    procedure btnEditCategoryClick(Sender: TObject);
+    procedure btnDelCategoryClick(Sender: TObject);
+    procedure btnRefreshClick(Sender: TObject);
+    procedure BooksDSBeforeOpen(DataSet: TDataSet);
+    procedure btnAddBookClick(Sender: TObject);
+    procedure btnEditBookClick(Sender: TObject);
+    procedure btnRefreshBookClick(Sender: TObject);
+    procedure btnDelBookClick(Sender: TObject);
   private
     FManager : TObjectManager;
+    FCategories: TList<TCategory>;
+    FCategoryController: TCategoryController;
+
+    procedure OpenCategoryDataSet;
+    procedure OpenBookDataSet;
+
+    procedure SynhronizeLibrary;
   public
     { Public declarations }
   end;
@@ -92,9 +108,16 @@ implementation
 
 uses
   Common.DBConnection,
-  Model.Entities,
   Aurelius.Criteria.Base,
-  Common.Utils;
+  Common.Utils,
+  Controller.Book,
+  Form.EditCategory,
+  Form.EditBook,
+  System.IniFiles,
+  Vcl.FileCtrl;
+
+resourcestring
+  rsConfirmDeleteRecord = 'Вы действительно хотите удалить %s "%s"?';
 
 {$R *.dfm}
 
@@ -106,7 +129,15 @@ end;
 procedure TfrmMain.actRefreshLibraryExecute(Sender: TObject);
 begin
   // Обновление библиотеки
-  //TController.SynhronizeLibrary;
+  aiProgress.Visible := True;
+  aiProgress.Active  := True;
+  try
+    Application.ProcessMessages;
+    SynhronizeLibrary;
+  finally
+    aiProgress.Active  := False;
+    aiProgress.Visible := False;
+  end;
 end;
 
 procedure TfrmMain.actSQLMonitorExecute(Sender: TObject);
@@ -114,34 +145,131 @@ begin
   TFrmSqlMonitoring.GetInstance.Show;
 end;
 
-procedure TfrmMain.btnAddCategoryClick(Sender: TObject);
+procedure TfrmMain.BooksDSBeforeOpen(DataSet: TDataSet);
 begin
-  // Новая категория
+  //ShowInfo('Метод BeforeOpen');
 end;
 
-procedure TfrmMain.btnCreateObjectClick(Sender: TObject);
+procedure TfrmMain.btnAddBookClick(Sender: TObject);
 var
-  Cat: TCategory;
-  CategoryID : Integer;
+  frmEditBook: TfrmEditBook;
 begin
+  frmEditBook := TfrmEditBook.Create(Self);
   try
-    { Новая категория }
-    Cat := FManager.Find<TCategory>(1);
-    if Cat = nil then begin
-      Cat := TCategory.Create;
-      Cat.CategoryName := 'Все книги';
-      FManager.Save(Cat);
+    frmEditBook.Header := 'Новая книга';
+    frmEditBook.SetParentCategory(CategoriesDS.Current<TCategory>);
+    if frmEditBook.ShowModal = mrOk then begin
+      OpenCategoryDataSet;
+      OpenBookDataSet;
     end;
-  except
-    ShowError('Не удалось добавить новую категорию');
+  finally
+    frmEditBook.Free;
   end;
+end;
+
+procedure TfrmMain.btnAddCategoryClick(Sender: TObject);
+var
+  frmEditCategory: TfrmEditCategory;
+begin
+  // Новая категория
+  frmEditCategory := TfrmEditCategory.Create(Self);
+  try
+    frmEditCategory.Header := 'Новая категория книг';
+    frmEditCategory.SetParentCategory(CategoriesDS.Current<TCategory>);
+    if frmEditCategory.ShowModal = mrOk then begin
+      OpenCategoryDataSet;
+    end;
+  finally
+    frmEditCategory.Free;
+  end;
+end;
+
+procedure TfrmMain.btnDelBookClick(Sender: TObject);
+var
+  Book: TBook;
+  Msg: string;
+  BookController: TBookController;
+begin
+  Book := BooksDS.Current<TBook>;
+  if ShowConfirmFmt(rsConfirmDeleteRecord, ['книгу', Book.BookName]) then
+  begin
+    BookController := TBookController.Create;
+    try
+      BookController.DeleteBook(Book);
+      OpenBookDataSet;
+    finally
+      BookController.Free;
+    end;
+  end;
+end;
+
+procedure TfrmMain.btnDelCategoryClick(Sender: TObject);
+var
+  Category: TCategory;
+  Msg: string;
+begin
+  Category := CategoriesDS.Current<TCategory>;
+
+  if ShowConfirmFmt(rsConfirmDeleteRecord, ['категорию', Category.CategoryName]) then
+  begin
+    FCategoryController.DeleteCategory(Category);
+    OpenCategoryDataSet;
+  end;
+end;
+
+procedure TfrmMain.btnEditBookClick(Sender: TObject);
+var
+  frmEditBook: TfrmEditBook;
+  Book: TBook;
+begin
+  Book := BooksDS.Current<TBook>;
+  frmEditBook := TfrmEditBook.Create(Self);
+  try
+    frmEditBook.Header := Format('Редактирование книги: %s', [Book.BookName]);
+    frmEditBook.SetParentCategory(Book.Category);
+    if frmEditBook.ShowModal = mrOk then begin
+      OpenCategoryDataSet;
+      OpenBookDataSet;
+    end;
+  finally
+    frmEditBook.Free;
+  end;
+end;
+
+procedure TfrmMain.btnEditCategoryClick(Sender: TObject);
+var
+  frmEditCategory: TfrmEditCategory;
+  Category: TCategory;
+begin
+  // Изменить категорию
+  Category := CategoriesDS.Current<TCategory>;
+  frmEditCategory := TfrmEditCategory.Create(Self);
+  try
+    frmEditCategory.SetCategory(Category.CategoryID);
+    frmEditCategory.Header := Format('Редактирование категории: %s', [Category.CategoryName]);
+    if frmEditCategory.ShowModal = mrOk then begin
+      OpenCategoryDataSet;
+    end;
+  finally
+    frmEditCategory.Free;
+  end;
+end;
+
+procedure TfrmMain.btnRefreshBookClick(Sender: TObject);
+begin
+  OpenBookDataSet;
+end;
+
+procedure TfrmMain.btnRefreshClick(Sender: TObject);
+begin
+  OpenCategoryDataSet;
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 var
   FDBManager : TDatabaseManager;
 begin
-// Добавляем листенер для SQL
+// Добавляем листенер для SQL мониторинга
   TDBConnection.GetInstance.AddCommandListener(TfrmSqlMonitoring.GetInstance);
 
 // Обновление структуры БД
@@ -153,25 +281,70 @@ begin
   end;
 
 // Менеджер объектов
-  FManager := TDBConnection.GetInstance.CreateObjectManager;
+  FManager    := TDBConnection.GetInstance.CreateObjectManager;
+  FCategoryController := TCategoryController.Create;
 
-  with CategoriesDS do begin
-    Manager := FManager;
-    SetSourceList( FManager.Find<TCategory>.List );
-    Open;
-  end;
+  sbMain.Panels[2].Text := Format('Всего книг зарегистрировано в базе данных: %d', [ FManager.FindAll<TBook>.Count ]);
 
-  with BooksDS do begin
-    Manager := FManager;
-    DatasetField := CategoriesDS.FieldByName('Books') as TDataSetField;
-    Open;
-  end;
+// открытие источников данных
+  OpenCategoryDataSet;
+  CategoriesDS.First;
+
+  OpenBookDataSet;
+
+  // Информация о БД
+  sbMain.Panels[1].Text := Format('База данных: %s', [ TDBConnection.GetDBName ]);
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
   FManager.Free;
+  FCategoryController.Free;
   inherited;
+end;
+
+procedure TfrmMain.OpenCategoryDataSet;
+begin
+  with CategoriesDS do begin
+    Close;
+    Manager := FManager;
+    SetSourceList( FCategoryController.GetAllCategory );
+    Open;
+  end;
+end;
+
+procedure TfrmMain.SynhronizeLibrary;
+var
+  FilesList: TFileRecordList;
+  StartDir: string;
+begin
+  // Синхронизация библиотеки
+  with TMemIniFile.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'conn.ini') do begin
+    StartDir := ReadString('Path', 'LibraryPath', 'D:\Книги');
+  end;
+
+  if StartDir = '' then begin
+    // вызов диалога для выбора каталога
+    SelectDirectory('Выберите каталог', 'C:\', StartDir);
+  end;
+
+  FilesList := TFileRecordList.Create;
+  try
+    FindAllFiles(FilesList, StartDir, '*.*');
+    sbMain.Panels[0].Text := Format('Найдено %d файла(ов)', [FilesList.Count]);
+  finally
+    FilesList.Free;
+  end;
+end;
+
+procedure TfrmMain.OpenBookDataSet;
+begin
+  //  OpenBookDataSet;
+  with BooksDS do begin
+    Manager := FManager;
+    DatasetField := CategoriesDS.FieldByName('Books') as TDataSetField;
+    Open;
+  end;
 end;
 
 end.

@@ -34,7 +34,7 @@ type
 
     [Association([TAssociationProp.Lazy], CascadeTypeAll - [TCascadeType.Remove])]
     [JoinColumn('CATEGORYID', [], 'CATEGORYID')]
-    FCategoryID: Proxy<TCategory>;
+    FCategory: Proxy<TCategory>;
 
   private
     function GetCategoryID: TCategory;
@@ -43,7 +43,7 @@ type
     property BookID: Integer read FBookID write FBookID;
     property BookName: String read FBookName write FBookName;
     property BookLink: Nullable<String> read FBookLink write FBookLink;
-    property CategoryID: TCategory read GetCategoryID write SetCategoryID;
+    property Category: TCategory read GetCategoryID write SetCategoryID;
   end;
 
   [Entity]
@@ -60,9 +60,9 @@ type
 
     [Association([TAssociationProp.Lazy], CascadeTypeAll - [TCascadeType.Remove])]
     [JoinColumn('PARENTID', [], 'CATEGORYID')]
-    FParentID: Proxy<TCategory>;
+    FParent: Proxy<TCategory>;
 
-    [ManyValuedAssociation([TAssociationProp.Lazy], [TCascadeType.SaveUpdate, TCascadeType.Merge], 'FCategoryID')]
+    [ManyValuedAssociation([TAssociationProp.Lazy], [TCascadeType.SaveUpdate, TCascadeType.Merge], 'FCategory')]
     FBooks: Proxy<TList<TBook>>;
 
   private
@@ -74,7 +74,7 @@ type
     destructor Destroy; override;
     property CategoryID: Integer read FCategoryID write FCategoryID;
     property CategoryName: String read FCategoryName write FCategoryName;
-    property ParentID: TCategory read GetParentID write SetParentID;
+    property Parent: TCategory read GetParentID write SetParentID;
     property Books: TList<TBook> read GetBooks;
   end;
 
@@ -85,24 +85,24 @@ implementation
 
 function TBook.GetCategoryID: TCategory;
 begin
-  result := FCategoryID.Value;
+  result := FCategory.Value;
 end;
 
 procedure TBook.SetCategoryID(const Value: TCategory);
 begin
-  FCategoryID.Value := Value;
+  FCategory.Value := Value;
 end;
 
 { TCategory}
 
 function TCategory.GetParentID: TCategory;
 begin
-  result := FParentID.Value;
+  result := FParent.Value;
 end;
 
 procedure TCategory.SetParentID(const Value: TCategory);
 begin
-  FParentID.Value := Value;
+  FParent.Value := Value;
 end;
 
 constructor TCategory.Create;

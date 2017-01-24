@@ -12,33 +12,30 @@ uses
 type
   TFolderLister = class
   private
-    FFolderList: TStringList;
-    FStartDir  : string;
-    FFileMask  : string;
-  protected
-    function GetFolderList: TStringList;
+    FFolderList: TFileRecordList;
   public
-    property FolderList : TStringList read GetFolderList;
-    property StartDir   : string      read FStartDir write FStartDir;
-    property FileMask   : string      read FFileMask write FFileMask;
+    class function GetFolderList(const StartDir: string; const FileMask: string = ''): TFileRecordList;
   end;
 
 implementation
 
 { FolderLister }
 
-function TFolderLister.GetFolderList: TStringList;
+class function TFolderLister.GetFolderList(const StartDir: string; const FileMask: string = ''): TFileRecordList;
+var
+  eMask: string;
+  tmpList: TFileRecordList;
 begin
-  if FStartDir = '' then begin
-    // вызов диалога для выбора каталога
-    SelectDirectory('Выберите каталог', 'C:\', FStartDir);
+  eMask := FileMask;
+  if eMask = '' then
+     eMask := '*.*';
+  tmpList := TFileRecordList.Create;
+  try
+    FindAllFiles(tmpList, StartDir, eMask);
+    Result := tmpList;
+  finally
+    tmpList.Free;
   end;
-
-  if FFileMask = '' then
-    FFileMask := '*.*';
-
-  FindAllFiles(Result, FStartDir, FFileMask);
-
 end;
 
 end.

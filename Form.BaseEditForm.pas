@@ -17,6 +17,7 @@ type
     pnlEditor: TPanel;
     bvlTop: TBevel;
     bvlBottom: TBevel;
+    procedure btnCancelClick(Sender: TObject);
   private
     FHeader: string;
   private
@@ -34,6 +35,11 @@ implementation
 {$R *.dfm}
 
 { TfrmBaseEditor }
+
+procedure TfrmBaseEditor.btnCancelClick(Sender: TObject);
+begin
+  ModalResult := mrCancel;
+end;
 
 function TfrmBaseEditor.GetHeader: string;
 begin
