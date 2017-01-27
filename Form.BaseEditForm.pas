@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Form.BaseForm, dxSkinsCore,
   dxSkinMetropolis, cxGraphics, cxLookAndFeels, cxLookAndFeelPainters,
-  Vcl.Menus, Vcl.StdCtrls, cxButtons, Vcl.ExtCtrls, cxClasses, dxSkinsForm;
+  Vcl.Menus, Vcl.StdCtrls, cxButtons, Vcl.ExtCtrls, cxClasses, dxSkinsForm,
+  System.ImageList, Vcl.ImgList;
 
 type
   TfrmBaseEditor = class(TfrmBase)

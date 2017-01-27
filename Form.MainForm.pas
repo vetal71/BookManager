@@ -21,8 +21,7 @@ uses
   cxGridTableView, cxGridDBTableView, cxGrid,
   cxCustomData, cxFilter, cxData, cxDBEdit, Vcl.ComCtrls, Vcl.ToolWin, cxTL,
   cxTLdxBarBuiltInMenu, cxInplaceContainer, cxTLData, cxDBTL, cxMaskEdit,
-  Vcl.Grids, Vcl.DBGrids, dxBarBuiltInMenu, cxPC,
-   ;
+  Vcl.Grids, Vcl.DBGrids, dxBarBuiltInMenu, cxPC;
 
 type
   TfrmMain = class(TfrmBase)

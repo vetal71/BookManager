@@ -10,7 +10,7 @@ uses
   Vcl.ExtCtrls, cxControls, cxContainer, cxEdit, cxMaskEdit, cxDropDownEdit,
   cxTextEdit, cxLabel, Vcl.Buttons,
   Model.Entities,
-  Controller.EditBook;
+  Controller.EditBook, System.ImageList, Vcl.ImgList;
 
 type
   TfrmEditBook = class(TfrmBaseEditor)

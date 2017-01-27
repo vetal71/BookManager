@@ -46,10 +46,6 @@ inherited frmMain: TfrmMain
     TabOrder = 5
     Properties.ActivePage = tsMainView
     Properties.CustomButtons.Buttons = <>
-    ExplicitLeft = 400
-    ExplicitTop = 168
-    ExplicitWidth = 289
-    ExplicitHeight = 193
     ClientRectBottom = 588
     ClientRectLeft = 2
     ClientRectRight = 1274
@@ -57,16 +53,21 @@ inherited frmMain: TfrmMain
     object tsMainView: TcxTabSheet
       Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075
       ImageIndex = 0
-      ExplicitHeight = 513
     end
     object tsAudit: TcxTabSheet
       Caption = #1040#1091#1076#1080#1090#1086#1088
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
       ExplicitHeight = 513
     end
     object tsSQLMonitor: TcxTabSheet
       Caption = #1052#1086#1085#1080#1090#1086#1088#1080#1085#1075' '#1079#1072#1087#1088#1086#1089#1086#1074
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
       ExplicitHeight = 513
     end
   end

@@ -78,4 +78,10 @@ inherited frmBaseEditor: TfrmBaseEditor
     Left = 221
     Top = 40
   end
+  inherited ilSmall: TcxImageList
+    FormatVersion = 1
+  end
+  inherited ilEdit: TcxImageList
+    FormatVersion = 1
+  end
 end

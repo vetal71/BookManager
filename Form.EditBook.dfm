@@ -12,28 +12,38 @@ inherited frmEditBook: TfrmEditBook
   TextHeight = 20
   inherited bvlTop: TBevel
     Width = 669
+    ExplicitWidth = 669
   end
   inherited bvlBottom: TBevel
     Top = 191
     Width = 669
+    ExplicitTop = 191
+    ExplicitWidth = 669
   end
   inherited pnlButton: TPanel
     Top = 193
     Width = 669
+    ExplicitTop = 193
+    ExplicitWidth = 669
     inherited btnOK: TcxButton
       Left = 418
       OnClick = btnOKClick
+      ExplicitLeft = 418
     end
     inherited btnCancel: TcxButton
       Left = 543
+      ExplicitLeft = 543
     end
   end
   inherited pnlHeader: TPanel
     Width = 669
+    ExplicitWidth = 669
   end
   inherited pnlEditor: TPanel
     Width = 669
     Height = 140
+    ExplicitWidth = 669
+    ExplicitHeight = 140
     object lblCategoryName: TcxLabel
       Left = 16
       Top = 57
@@ -45,7 +55,6 @@ inherited frmEditBook: TfrmEditBook
       Top = 56
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 1
-      ExplicitWidth = 555
       Width = 527
     end
     object lblParentCategory: TcxLabel
@@ -60,7 +69,6 @@ inherited frmEditBook: TfrmEditBook
       Anchors = [akLeft, akTop, akRight]
       Properties.AutoSelect = False
       TabOrder = 3
-      ExplicitWidth = 442
       Width = 419
     end
     object btnAddCategory: TcxButton
@@ -119,7 +127,6 @@ inherited frmEditBook: TfrmEditBook
       Top = 96
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 6
-      ExplicitWidth = 658
       Width = 494
     end
     object btnFileLink: TcxButton
@@ -167,5 +174,11 @@ inherited frmEditBook: TfrmEditBook
       TabOrder = 7
       ExplicitLeft = 797
     end
+  end
+  inherited ilSmall: TcxImageList
+    FormatVersion = 1
+  end
+  inherited ilEdit: TcxImageList
+    FormatVersion = 1
   end
 end
