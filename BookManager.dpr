@@ -14,7 +14,10 @@ uses
   Form.BaseEditForm in 'Form.BaseEditForm.pas' {frmBaseEditor},
   Form.EditCategory in 'Form.EditCategory.pas' {frmEditCategory},
   Form.EditBook in 'Form.EditBook.pas' {frmEditBook},
-  Controller.Book in 'Controller.Book.pas';
+  Controller.Book in 'Controller.Book.pas',
+  Form.MainView in 'Form.MainView.pas' {frmLibraryView},
+  Form.AuditLogViewer in 'Form.AuditLogViewer.pas' {frmAuditLogViewer},
+  Common.DatabaseUtils in 'Common.DatabaseUtils.pas';
 
 {$R *.res}
 
@@ -22,5 +25,7 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TfrmLibraryView, frmLibraryView);
+  Application.CreateForm(TfrmAuditLogViewer, frmAuditLogViewer);
   Application.Run;
 end.

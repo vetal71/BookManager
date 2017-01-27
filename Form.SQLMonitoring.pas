@@ -11,21 +11,31 @@ uses
   cxButtons, Vcl.ExtCtrls,
   System.Generics.Collections,
   Aurelius.Drivers.Interfaces,
-  Aurelius.Commands.Listeners;
+  Aurelius.Commands.Listeners, System.ImageList, Vcl.ImgList,
+  cxCheckBox, Aurelius.Events.Manager, Aurelius.Mapping.Explorer;
 
 type
-  TfrmSQLMonitoring = class(TfrmBase, ICommandExecutionListener)
+  TfrmSQLMonitoring = class(TfrmBase)
     mmoLog: TcxMemo;
     pnlButton: TPanel;
-    btnExit: TcxButton;
     btnClear: TcxButton;
-    procedure btnExitClick(Sender: TObject);
+    chkEnableMonitor: TcxCheckBox;
+    procedure btnClearClick(Sender: TObject);
+    procedure chkEnableMonitorClick(Sender: TObject);
   private
     class var
       FInstance: TfrmSqlMonitoring;
-    procedure ExecutingCommand(SQL: string; Params: TEnumerable<TDBParam>);
+  private
+    FSqlExecutingProc: TSQLExecutingProc;
+    procedure SqlExecutingHandler(Args: TSQLExecutingArgs);
+  private
+    procedure Log(const S: string);
+    procedure BreakLine;
+    procedure SubscribeListeners;
+    procedure UnsubscribeListeners;
   public
-    class function GetInstance: TfrmSqlMonitoring;
+    class function GetInstance: TfrmSQLMonitoring;
+    constructor Create(AOwner: TComponent); override;
   end;
 
 implementation
@@ -37,23 +47,68 @@ uses
 
 { TfrmSQLMonitoring }
 
-procedure TfrmSQLMonitoring.btnExitClick(Sender: TObject);
+procedure TfrmSQLMonitoring.BreakLine;
 begin
-  Hide;
+  mmoLog.Lines.Add('================================================');
 end;
 
-procedure TfrmSQLMonitoring.ExecutingCommand(SQL: string;
-  Params: TEnumerable<TDBParam>);
+procedure TfrmSQLMonitoring.btnClearClick(Sender: TObject);
 begin
-  TDBConnection.AddLines(mmoLog.Lines, SQL, Params);
-  Application.ProcessMessages;
+  mmoLog.Clear;
 end;
 
-class function TfrmSQLMonitoring.GetInstance: TfrmSqlMonitoring;
+procedure TfrmSQLMonitoring.chkEnableMonitorClick(Sender: TObject);
+begin
+  if chkEnableMonitor.Checked then
+    SubscribeListeners
+  else
+    UnsubscribeListeners;
+end;
+
+constructor TfrmSQLMonitoring.Create(AOwner: TComponent);
+begin
+  inherited;
+  FSqlExecutingProc := SqlExecutingHandler;
+  SubscribeListeners;
+end;
+
+class function TfrmSQLMonitoring.GetInstance: TfrmSQLMonitoring;
 begin
   if FInstance = nil then
-    FInstance := TfrmSqlMonitoring.Create(Application);
+    FInstance := TfrmSQLMonitoring.Create(Application);
   Result := FInstance;
+end;
+
+procedure TfrmSQLMonitoring.Log(const S: string);
+begin
+  mmoLog.Lines.Add(S);
+end;
+
+procedure TfrmSQLMonitoring.SqlExecutingHandler(Args: TSQLExecutingArgs);
+var
+  Param: TDBParam;
+begin
+  Log(Args.SQL);
+  if Args.Params <> nil then
+    for Param in Args.Params do
+      Log(Param.ToString);
+  BreakLine;
+end;
+
+procedure TfrmSQLMonitoring.SubscribeListeners;
+var
+  E: TManagerEvents;
+begin
+  E := TMappingExplorer.Default.Events;
+  E.OnSQLExecuting.Subscribe(FSqlExecutingProc);
+end;
+
+procedure TfrmSQLMonitoring.UnsubscribeListeners;
+var
+  E: TManagerEvents;
+begin
+  E := TMappingExplorer.Default.Events;
+  E.OnSqlExecuting.Unsubscribe(FSqlExecutingProc);
 end;
 
 end.
