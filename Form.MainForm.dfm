@@ -1,19 +1,19 @@
 inherited frmMain: TfrmMain
   Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075
   ClientHeight = 681
-  ClientWidth = 1374
+  ClientWidth = 1276
   ShowHint = True
   WindowState = wsMaximized
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  ExplicitWidth = 1390
+  ExplicitWidth = 1292
   ExplicitHeight = 719
   PixelsPerInch = 96
   TextHeight = 20
   object bvlMain: TdxBevel [0]
     Left = 461
     Top = 71
-    Width = 913
+    Width = 815
     Height = 509
     Align = alClient
     LookAndFeel.NativeStyle = False
@@ -26,7 +26,7 @@ inherited frmMain: TfrmMain
   object sbMain: TdxStatusBar [1]
     Left = 0
     Top = 661
-    Width = 1374
+    Width = 1276
     Height = 20
     Panels = <
       item
@@ -48,6 +48,7 @@ inherited frmMain: TfrmMain
     Font.Height = -11
     Font.Name = 'Segoe UI'
     Font.Style = []
+    ExplicitWidth = 1374
   end
   object pnlLeft: TPanel [2]
     Left = 0
@@ -148,19 +149,21 @@ inherited frmMain: TfrmMain
   object pnlRight: TPanel [4]
     Left = 461
     Top = 71
-    Width = 913
+    Width = 815
     Height = 509
     Align = alClient
     BevelOuter = bvLowered
     TabOrder = 7
+    ExplicitWidth = 913
     object grdBooks: TcxGrid
       AlignWithMargins = True
       Left = 4
       Top = 26
-      Width = 905
+      Width = 807
       Height = 479
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 905
       object grdBooksView: TcxGridDBTableView
         Navigator.Buttons.CustomButtons = <>
         FindPanel.InfoText = #1042#1074#1077#1076#1080#1090#1077' '#1090#1077#1082#1089#1090' '#1076#1083#1103' '#1087#1086#1080#1089#1082#1072'...'
@@ -211,7 +214,7 @@ inherited frmMain: TfrmMain
     object tbBookEdit: TToolBar
       Left = 1
       Top = 1
-      Width = 911
+      Width = 813
       Height = 22
       AutoSize = True
       Caption = #1055#1072#1085#1077#1083#1100' '#1088#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1085#1080#1103' '#1082#1085#1080#1075#1080
@@ -253,11 +256,12 @@ inherited frmMain: TfrmMain
   object aiProgress: TdxActivityIndicator [5]
     Left = 0
     Top = 580
-    Width = 1374
+    Width = 1276
     Height = 81
     Align = alBottom
     PropertiesClassName = 'TdxActivityIndicatorHorizontalDotsProperties'
     Visible = False
+    ExplicitWidth = 1374
   end
   inherited sknMain: TdxSkinController
     Top = 120
