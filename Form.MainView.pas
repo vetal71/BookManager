@@ -44,7 +44,6 @@ type
     btnEditBook: TToolButton;
     btnDelBook: TToolButton;
     btnRefreshBook: TToolButton;
-    aiProgress: TdxActivityIndicator;
     CategoriesDS: TAureliusDataset;
     dsCategories: TDataSource;
     BooksDS: TAureliusDataset;
@@ -58,7 +57,7 @@ type
     procedure btnEditBookClick(Sender: TObject);
     procedure btnRefreshBookClick(Sender: TObject);
     procedure btnDelBookClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     class var
       FInstance: TfrmLibraryView;
@@ -67,11 +66,8 @@ type
     FCategories: TList<TCategory>;
     FCategoryController: TCategoryController;
     FOwnsManager: Boolean;
-
-    procedure OpenCategoryDataSet;
-    procedure OpenBookDataSet;
-    procedure SynhronizeLibrary;
-    class function GetInstance: TfrmLibraryView; static;
+  private
+    procedure LoadData(SelectedId: Integer = 0);
   public
     constructor Create(AOwner: TComponent; AManager: TObjectManager; AOwnsManager: Boolean); reintroduce;
   end;
@@ -97,24 +93,6 @@ resourcestring
 
 { TfrmLibraryView }
 
-procedure TfrmLibraryView.FormCreate(Sender: TObject);
-begin
-  inherited;
-
-// открытие источников данных
-  OpenCategoryDataSet;
-  CategoriesDS.First;
-
-  OpenBookDataSet;
-end;
-
-class function TfrmLibraryView.GetInstance: TfrmLibraryView;
-begin
-  if FInstance = nil then
-    FInstance := TfrmLibraryView.Create(Application);
-  Result := FInstance;
-end;
-
 procedure TfrmLibraryView.BooksDSBeforeOpen(DataSet: TDataSet);
 begin
   //ShowInfo('Метод BeforeOpen');
@@ -124,13 +102,12 @@ procedure TfrmLibraryView.btnAddBookClick(Sender: TObject);
 var
   frmEditBook: TfrmEditBook;
 begin
-  frmEditBook := TfrmEditBook.Create(Self);
+  frmEditBook := TfrmEditBook.Create(Self, FManager);
   try
     frmEditBook.Header := 'Новая книга';
     frmEditBook.SetParentCategory(CategoriesDS.Current<TCategory>);
     if frmEditBook.ShowModal = mrOk then begin
-      OpenCategoryDataSet;
-      OpenBookDataSet;
+      LoadData(CategoriesDS.Current<TCategory>.ID);
     end;
   finally
     frmEditBook.Free;
@@ -142,12 +119,12 @@ var
   frmEditCategory: TfrmEditCategory;
 begin
   // Новая категория
-  frmEditCategory := TfrmEditCategory.Create(Self);
+  frmEditCategory := TfrmEditCategory.Create(Self, FManager);
   try
     frmEditCategory.Header := 'Новая категория книг';
     frmEditCategory.SetParentCategory(CategoriesDS.Current<TCategory>);
     if frmEditCategory.ShowModal = mrOk then begin
-      OpenCategoryDataSet;
+      LoadData(frmEditCategory.CategoryId);
     end;
   finally
     frmEditCategory.Free;
@@ -163,10 +140,10 @@ begin
   Book := BooksDS.Current<TBook>;
   if ShowConfirmFmt(rsConfirmDeleteRecord, ['книгу', Book.BookName]) then
   begin
-    BookController := TBookController.Create;
+    BookController := TBookController.Create(FManager);
     try
       BookController.DeleteBook(Book);
-      OpenBookDataSet;
+      LoadData(CategoriesDS.Current<TCategory>.ID);
     finally
       BookController.Free;
     end;
@@ -183,7 +160,7 @@ begin
   if ShowConfirmFmt(rsConfirmDeleteRecord, ['категорию', Category.CategoryName]) then
   begin
     FCategoryController.DeleteCategory(Category);
-    OpenCategoryDataSet;
+    LoadData(CategoriesDS.Current<TCategory>.ID);
   end;
 end;
 
@@ -193,13 +170,12 @@ var
   Book: TBook;
 begin
   Book := BooksDS.Current<TBook>;
-  frmEditBook := TfrmEditBook.Create(Self);
+  frmEditBook := TfrmEditBook.Create(Self, FManager);
   try
     frmEditBook.Header := Format('Редактирование книги: %s', [Book.BookName]);
-    frmEditBook.SetParentCategory(Book.Category);
+    frmEditBook.SetParentCategory(CategoriesDS.Current<TCategory>);
     if frmEditBook.ShowModal = mrOk then begin
-      OpenCategoryDataSet;
-      OpenBookDataSet;
+      LoadData(CategoriesDS.Current<TCategory>.ID);
     end;
   finally
     frmEditBook.Free;
@@ -213,12 +189,12 @@ var
 begin
   // Изменить категорию
   Category := CategoriesDS.Current<TCategory>;
-  frmEditCategory := TfrmEditCategory.Create(Self);
+  frmEditCategory := TfrmEditCategory.Create(Self, FManager);
   try
-    frmEditCategory.SetCategory(Category.CategoryID);
+    frmEditCategory.SetCategory(Category.ID);
     frmEditCategory.Header := Format('Редактирование категории: %s', [Category.CategoryName]);
     if frmEditCategory.ShowModal = mrOk then begin
-      OpenCategoryDataSet;
+      LoadData(CategoriesDS.Current<TCategory>.ID);
     end;
   finally
     frmEditCategory.Free;
@@ -227,80 +203,46 @@ end;
 
 procedure TfrmLibraryView.btnRefreshBookClick(Sender: TObject);
 begin
-  OpenBookDataSet;
+  LoadData(CategoriesDS.Current<TCategory>.ID);
 end;
 
 procedure TfrmLibraryView.btnRefreshClick(Sender: TObject);
 begin
-  OpenCategoryDataSet;
+  LoadData(CategoriesDS.Current<TCategory>.ID);
 end;
 
 constructor TfrmLibraryView.Create(AOwner: TComponent; AManager: TObjectManager;
   AOwnsManager: Boolean);
 begin
   inherited Create(AOwner);
-  FManager := AManager;
+  FManager     := AManager;
   FOwnsManager := AOwnsManager;
 end;
 
-(*
-procedure TfrmLibraryView.actRefreshLibraryExecute(Sender: TObject);
+procedure TfrmLibraryView.FormShow(Sender: TObject);
 begin
-  // Обновление библиотеки
-  aiProgress.Visible := True;
-  aiProgress.Active  := True;
-  try
-    Application.ProcessMessages;
-    SynhronizeLibrary;
-  finally
-    aiProgress.Active  := False;
-    aiProgress.Visible := False;
-  end;
-end;
-*)
-
-procedure TfrmLibraryView.OpenCategoryDataSet;
-begin
-  with CategoriesDS do begin
-    Close;
-    Manager := FManager;
-    SetSourceList( FCategoryController.GetAllCategory );
-    Open;
-  end;
+  inherited;
+  LoadData;
 end;
 
-procedure TfrmLibraryView.SynhronizeLibrary;
+procedure TfrmLibraryView.LoadData(SelectedId: Integer);
 var
-  FilesList: TFileRecordList;
-  StartDir: string;
+  Criteria: TCriteria;
 begin
-  // Синхронизация библиотеки
-  with TMemIniFile.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'conn.ini') do begin
-    StartDir := ReadString('Path', 'SearchPath', 'D:\Книги');
-  end;
+  if (SelectedId = 0) and (CategoriesDS.Current<TCategory> <> nil) then
+    SelectedId := CategoriesDS.Current<TCategory>.ID;
+  CategoriesDS.Close;
+  BooksDS.Close;
+  FManager.Clear;
 
-  if StartDir = '' then begin
-    // вызов диалога для выбора каталога
-    SelectDirectory('Выберите каталог', 'C:\', StartDir);
-  end;
+  Criteria := FManager.Find<TCategory>.OrderBy('ID');
+  CategoriesDS.SetSourceCriteria(Criteria);
 
-  FilesList := TFileRecordList.Create;
-  try
-    FindAllFiles(FilesList, StartDir, '*.*');
-    //sbMain.Panels[0].Text := Format('Найдено %d файла(ов)', [FilesList.Count]);
-  finally
-    FilesList.Free;
-  end;
-end;
-
-procedure TfrmLibraryView.OpenBookDataSet;
-begin
-  //  OpenBookDataSet;
-  with BooksDS do begin
-    Manager := FManager;
-    DatasetField := CategoriesDS.FieldByName('Books') as TDataSetField;
-    Open;
-  end;
+  CategoriesDS.Open;
+  if SelectedId <> 0 then
+    CategoriesDS.Locate('ID', SelectedId, []);
+  BooksDS.DatasetField := (CategoriesDS.FieldByName('Books') as TDataSetField);
+  BooksDS.Open;
 end;
 
 end.

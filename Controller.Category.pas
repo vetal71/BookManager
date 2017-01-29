@@ -4,19 +4,14 @@ interface
 
 uses
   System.Generics.Collections,
-  Aurelius.Engine.ObjectManager,
+  Controller.Base,
   Model.Entities;
 
 type
-  TCategoryController = class
-  private
-    FManager: TObjectManager;
+  TCategoryController = class(BaseController)
   public
     procedure DeleteCategory(ACategory: TCategory);
     function GetAllCategory: TList<TCategory>;
-  public
-    constructor Create;
-    destructor Destroy; override;
   end;
 
 implementation
@@ -26,28 +21,17 @@ uses
 
 { TCategoryController }
 
-constructor TCategoryController.Create;
-begin
-  FManager := TDBConnection.GetInstance.CreateObjectManager;
-end;
-
 procedure TCategoryController.DeleteCategory(ACategory: TCategory);
 begin
   if not FManager.IsAttached(ACategory) then
-    ACategory := FManager.Find<TCategory>(ACategory.CategoryID);
+    ACategory := FManager.Find<TCategory>(ACategory.ID);
   FManager.Remove(ACategory);
-end;
-
-destructor TCategoryController.Destroy;
-begin
-  FManager.Free;
-  inherited;
 end;
 
 function TCategoryController.GetAllCategory: TList<TCategory>;
 begin
   FManager.Clear;
-  Result := FManager.FindAll<TCategory>;
+  Result := FManager.Find<TCategory>.List;
 end;
 
 end.

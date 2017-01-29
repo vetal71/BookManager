@@ -21,7 +21,8 @@ uses
   cxGridTableView, cxGridDBTableView, cxGrid,
   cxCustomData, cxFilter, cxData, cxDBEdit, Vcl.ComCtrls, Vcl.ToolWin, cxTL,
   cxTLdxBarBuiltInMenu, cxInplaceContainer, cxTLData, cxDBTL, cxMaskEdit,
-  Vcl.Grids, Vcl.DBGrids, dxBarBuiltInMenu, cxPC;
+  Vcl.Grids, Vcl.DBGrids, dxBarBuiltInMenu, cxPC,
+  Common.DBConnection;
 
 type
   TfrmMain = class(TfrmBase)
@@ -50,7 +51,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure actExitExecute(Sender: TObject);
     procedure actRefreshLibraryExecute(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
     Connection: IDBConnection;
@@ -68,7 +68,7 @@ var
 implementation
 
 uses
-  Common.DBConnection,
+  Common.DatabaseUtils,
   Form.AuditLogViewer,
   Form.MainView;
 
@@ -87,32 +87,18 @@ end;
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
 
-  Connection := TDBConnection.GetInstance;
+  Connection := TDBConnection.CreateConnection;
 
-(*
-// Обновление структуры БД
-  FDBManager := TDBConnection.GetInstance.GetNewDatabaseManager;
-  try
-    FDBManager.UpdateDatabase;
-  finally
-    FDBManager.Free;
-  end;
-
+  UpdateDatabaseShema(Connection);
+  FillData(Connection);
 
 // Менеджер объектов
-  FManager    := TDBConnection.GetInstance.CreateObjectManager;
+//  FManager    := TDBConnection.GetInstance.CreateObjectManager;
 
-  sbMain.Panels[2].Text := Format('Всего книг зарегистрировано в базе данных: %d', [ FManager.FindAll<TBook>.Count ]);
-*)
+//  sbMain.Panels[2].Text := Format('Всего книг зарегистрировано в базе данных: %d', [ FManager.FindAll<TBook>.Count ]);
 
   // Информация о БД
-  sbMain.Panels[1].Text := Format('База данных: %s', [ TDBConnection.GetDBName ]);
-end;
-
-procedure TfrmMain.FormDestroy(Sender: TObject);
-begin
-//  FManager.Free;
-  inherited;
+  //sbMain.Panels[1].Text := Format('База данных: %s', [ TDBConnection.GetDBName ]);
 end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
@@ -137,7 +123,7 @@ procedure TfrmMain.ShowLibraryForm;
 var
   F: TfrmLibraryView;
 begin
-  F := TfrmLibraryView.Create(Application, TObjectManager.Create(DBConnection), True);
+  F := TfrmLibraryView.Create(Application, TObjectManager.Create(TDBConnection.CreateConnection), True);
   F.Parent := tsMainView;
   F.Align := alClient;
   F.BorderStyle := bsNone;

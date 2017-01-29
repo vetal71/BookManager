@@ -5,19 +5,19 @@ interface
 uses
   Model.Entities,
   System.Generics.Collections,
+  Controller.Base,
   Aurelius.Engine.ObjectManager;
 
 type
-  TEditBookController = class
+  TEditBookController = class(BaseController)
   private
-    FManager: TObjectManager;
     FBook: TBook;
   public
     procedure SaveBook(Book: TBook);
     procedure Load(BookID: Variant);
     function GetCategories: TList<TCategory>;
   public
-    constructor Create;
+    constructor Create(AManager: TObjectManager); overload;
     destructor Destroy; override;
   public
     property Book: TBook read FBook;
@@ -31,9 +31,9 @@ uses
 
 { TBookController }
 
-constructor TEditBookController.Create;
+constructor TEditBookController.Create(AManager: TObjectManager);
 begin
-  FManager := TDBConnection.GetInstance.CreateObjectManager;
+  inherited Create(AManager);
   FBook := TBook.Create;
 end;
 
@@ -41,7 +41,6 @@ destructor TEditBookController.Destroy;
 begin
   if not FManager.IsAttached(FBook) then
     FBook.Free;
-  FManager.Free;
   inherited;
 end;
 

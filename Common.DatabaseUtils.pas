@@ -11,7 +11,6 @@ uses
 
 procedure UpdateDatabaseShema(Conn: IDBConnection);
 procedure FillData(Conn: IDBConnection);
-function CreateDataFromFiles(Man: TObjectManager): Integer;
 
 implementation
 
@@ -19,10 +18,44 @@ uses
   System.IniFiles,
   System.SysUtils,
   Vcl.FileCtrl,
-  Common.Utils;
+  Common.Utils,
+  WaitForm;
 
+procedure AddRecordsToDatabase(FR: TFileRecordList; AManager: TObjectManager);
+var
+  Category: TCategory;
+  Book: TBook;
+  I: Integer;
+begin
+  Category := AManager.Find<TCategory>(1);
+  if Category = nil then begin
+    Category := TCategory.Create;
+    try
+      Category.ID := 1;
+      Category.CategoryName := 'Все книги';
+      AManager.Replicate<TCategory>(Category);
+    finally
+      Category.Free;
+    end;
 
-function CreateDataFromFiles(Man: TObjectManager): Integer;
+    for I := 0 to FR.Count - 1 do begin
+      TWaiting.Status(Format('Добавление записи: %s', [ FR[ I ].FileName ]));
+      Book := TBook.Create;
+      try
+        Book.ID   := I + 1;
+        Book.BookName := FR[ I ].FileName;
+        Book.BookLink := FR[ I ].FilePath;
+        Category := AManager.Find<TCategory>(1);
+        Category.Books.Add(AManager.Replicate<TBook>(Book));
+      finally
+        Book.Free;
+      end;
+    end;
+    AManager.Flush;
+  end;
+end;
+
+procedure CreateDataFromFiles(AManager: TObjectManager);
 var
   FilesList: TFileRecordList;
   StartDir: string;
@@ -32,15 +65,15 @@ begin
     StartDir := ReadString('Path', 'SearchPath', 'D:\Книги');
   end;
 
-  if StartDir = '' then begin
+  if (StartDir = '') or (not DirectoryExists(StartDir)) then begin
     // вызов диалога для выбора каталога
-    SelectDirectory('Выберите каталог', 'C:\', StartDir);
+    if not SelectDirectory('Выберите каталог', 'C:\', StartDir) then Exit;
   end;
 
   FilesList := TFileRecordList.Create;
   try
     FindAllFiles(FilesList, StartDir, '*.*');
-    //sbMain.Panels[0].Text := Format('Найдено %d файла(ов)', [FilesList.Count]);
+    AddRecordsToDatabase(FilesList, AManager);
   finally
     FilesList.Free;
   end;
@@ -65,11 +98,15 @@ var
 begin
   Manager := TObjectManager.Create(Conn);
   try
-    if Manager.Find<TBook>.Take(1).UniqueResult = nil then
+    if Manager.FindAll<TBook>.Count = 0 then
     begin
       Trans := conn.BeginTransaction;
       try
-        CreateDataFromFiles(Manager);
+        TWaiting.Start('Обновление библиотеки',
+          procedure
+          begin
+            CreateDataFromFiles(Manager);
+          end);
         Trans.Commit;
       except
         Trans.Rollback;

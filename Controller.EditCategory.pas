@@ -5,15 +5,15 @@ interface
 uses
   Generics.Collections,
   Aurelius.Engine.ObjectManager,
+  Controller.Base,
   Model.Entities;
 
 type
-  TEditCategoryController = class
+  TEditCategoryController = class(BaseController)
   private
-    FManager: TObjectManager;
     FCategory: TCategory;
   public
-    constructor Create;
+    constructor Create(AManager: TObjectManager); overload;
     destructor Destroy; override;
   public
     procedure SaveCategory(Category: TCategory);
@@ -30,9 +30,9 @@ uses
 
 { TEditCategoryController }
 
-constructor TEditCategoryController.Create;
+constructor TEditCategoryController.Create(AManager: TObjectManager);
 begin
-  FManager := TDBConnection.GetInstance.CreateObjectManager;
+  inherited Create(AManager);
   FCategory := TCategory.Create;
 end;
 
@@ -40,7 +40,6 @@ destructor TEditCategoryController.Destroy;
 begin
   if not FManager.IsAttached(FCategory) then
     FCategory.Free;
-  FManager.Free;
   inherited;
 end;
 

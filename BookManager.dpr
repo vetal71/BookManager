@@ -17,7 +17,9 @@ uses
   Controller.Book in 'Controller.Book.pas',
   Form.MainView in 'Form.MainView.pas' {frmLibraryView},
   Form.AuditLogViewer in 'Form.AuditLogViewer.pas' {frmAuditLogViewer},
-  Common.DatabaseUtils in 'Common.DatabaseUtils.pas';
+  Common.DatabaseUtils in 'Common.DatabaseUtils.pas',
+  WaitForm in 'WaitForm.pas' {Waiting},
+  Controller.Base in 'Controller.Base.pas';
 
 {$R *.res}
 
@@ -27,5 +29,6 @@ begin
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmLibraryView, frmLibraryView);
   Application.CreateForm(TfrmAuditLogViewer, frmAuditLogViewer);
+  Application.CreateForm(TWaiting, Waiting);
   Application.Run;
 end.

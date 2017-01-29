@@ -2,21 +2,19 @@ inherited frmLibraryView: TfrmLibraryView
   Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072
   ClientHeight = 615
   ClientWidth = 1039
-  OnCreate = FormCreate
+  OnShow = FormShow
   ExplicitWidth = 1055
-  ExplicitHeight = 653
+  ExplicitHeight = 654
   PixelsPerInch = 96
   TextHeight = 20
   object pnlLeft: TPanel [0]
     Left = 0
     Top = 0
     Width = 449
-    Height = 575
+    Height = 615
     Align = alLeft
     BevelOuter = bvLowered
     TabOrder = 0
-    ExplicitTop = 65
-    ExplicitHeight = 550
     object tbCategoryEdit: TToolBar
       Left = 1
       Top = 1
@@ -59,22 +57,22 @@ inherited frmLibraryView: TfrmLibraryView
       Left = 4
       Top = 26
       Width = 441
-      Height = 545
+      Height = 585
       Align = alClient
       Bands = <
         item
         end>
+      DataController.DataSource = dsCategories
       DataController.ParentField = 'Parent'
       DataController.KeyField = 'Self'
       Navigator.Buttons.CustomButtons = <>
       OptionsSelection.CellSelect = False
       RootValue = -1
       TabOrder = 1
-      ExplicitHeight = 520
       object lstCategoriesCategoryID: TcxDBTreeListColumn
         Caption.AlignHorz = taCenter
         Caption.Text = #1050#1086#1076
-        DataBinding.FieldName = 'CategoryID'
+        DataBinding.FieldName = 'ID'
         Width = 80
         Position.ColIndex = 0
         Position.RowIndex = 0
@@ -99,35 +97,28 @@ inherited frmLibraryView: TfrmLibraryView
     Left = 449
     Top = 0
     Width = 12
-    Height = 575
-    ExplicitTop = 65
-    ExplicitHeight = 550
+    Height = 615
   end
   object pnlRight: TPanel [2]
     Left = 461
     Top = 0
     Width = 578
-    Height = 575
+    Height = 615
     Align = alClient
     BevelOuter = bvLowered
     TabOrder = 2
-    ExplicitLeft = 224
-    ExplicitTop = 65
-    ExplicitWidth = 815
-    ExplicitHeight = 550
     object grdBooks: TcxGrid
       AlignWithMargins = True
       Left = 4
       Top = 26
       Width = 570
-      Height = 545
+      Height = 585
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 807
-      ExplicitHeight = 520
       object grdBooksView: TcxGridDBTableView
         Navigator.Buttons.CustomButtons = <>
         FindPanel.InfoText = #1042#1074#1077#1076#1080#1090#1077' '#1090#1077#1082#1089#1090' '#1076#1083#1103' '#1087#1086#1080#1089#1082#1072'...'
+        DataController.DataSource = dsBooks
         DataController.Summary.DefaultGroupSummaryItems = <>
         DataController.Summary.FooterSummaryItems = <>
         DataController.Summary.SummaryGroups = <>
@@ -150,7 +141,7 @@ inherited frmLibraryView: TfrmLibraryView
         OptionsView.Indicator = True
         object grdBooksViewID: TcxGridDBColumn
           Caption = #1050#1086#1076
-          DataBinding.FieldName = 'BookID'
+          DataBinding.FieldName = 'ID'
           HeaderAlignmentHorz = taCenter
         end
         object grdBooksViewBOOK_NAME: TcxGridDBColumn
@@ -180,7 +171,6 @@ inherited frmLibraryView: TfrmLibraryView
       Caption = #1055#1072#1085#1077#1083#1100' '#1088#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1085#1080#1103' '#1082#1085#1080#1075#1080
       Images = ilEdit
       TabOrder = 1
-      ExplicitWidth = 813
       object btnAddBook: TToolButton
         Left = 0
         Top = 0
@@ -209,17 +199,6 @@ inherited frmLibraryView: TfrmLibraryView
         ImageIndex = 3
       end
     end
-  end
-  object aiProgress: TdxActivityIndicator [3]
-    Left = 0
-    Top = 575
-    Width = 1039
-    Height = 40
-    Align = alBottom
-    PropertiesClassName = 'TdxActivityIndicatorHorizontalDotsProperties'
-    Visible = False
-    ExplicitLeft = -237
-    ExplicitWidth = 1276
   end
   inherited ilSmall: TcxImageList
     FormatVersion = 1

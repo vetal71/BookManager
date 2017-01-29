@@ -1,20 +1,19 @@
 inherited frmMain: TfrmMain
   Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075
-  ClientHeight = 681
-  ClientWidth = 1276
+  ClientHeight = 479
+  ClientWidth = 885
   ShowHint = True
   WindowState = wsMaximized
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
   OnShow = FormShow
-  ExplicitWidth = 1292
-  ExplicitHeight = 719
+  ExplicitWidth = 901
+  ExplicitHeight = 518
   PixelsPerInch = 96
   TextHeight = 20
   object sbMain: TdxStatusBar [0]
     Left = 0
-    Top = 661
-    Width = 1276
+    Top = 459
+    Width = 885
     Height = 20
     Panels = <
       item
@@ -40,15 +39,15 @@ inherited frmMain: TfrmMain
   object pgcMain: TcxPageControl [1]
     Left = 0
     Top = 71
-    Width = 1276
-    Height = 590
+    Width = 885
+    Height = 388
     Align = alClient
     TabOrder = 5
     Properties.ActivePage = tsMainView
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 588
+    ClientRectBottom = 386
     ClientRectLeft = 2
-    ClientRectRight = 1274
+    ClientRectRight = 883
     ClientRectTop = 35
     object tsMainView: TcxTabSheet
       Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075

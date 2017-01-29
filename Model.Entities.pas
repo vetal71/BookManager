@@ -16,13 +16,11 @@ type
   TBook = class;
   TCategory = class;
 
-  [Entity]
+  [Entity, Automapping]
   [Table('BOOKS')]
-  [Id('FBookID', TIdGenerator.IdentityOrSequence)]
   TBook = class
   strict private
-    [Column('BOOKID', [TColumnProp.Required, TColumnProp.NoInsert, TColumnProp.NoUpdate])]
-    FBookID: Integer;
+    FID: Integer;
 
     [Column('BOOKNAME', [TColumnProp.Required])]
     [DBTypeMemo]
@@ -33,7 +31,7 @@ type
     FBookLink: Nullable<String>;
 
   public
-    property BookID: Integer read FBookID write FBookID;
+    property ID: Integer read FID write FID;
     property BookName: String read FBookName write FBookName;
     property BookLink: Nullable<String> read FBookLink write FBookLink;
   public
@@ -41,36 +39,31 @@ type
     constructor Create(ABookName: string; ABookLink: Nullable<string>); overload;
   end;
 
-  [Entity]
+  [Entity, Automapping]
   [Table('CATEGORIES')]
-  [Id('FCategoryID', TIdGenerator.IdentityOrSequence)]
   TCategory = class
   strict private
-    [Column('CATEGORYID', [TColumnProp.Required, TColumnProp.NoInsert, TColumnProp.NoUpdate])]
-    FCategoryID: Integer;
+    FID: Integer;
 
     [Column('CATEGORYNAME', [TColumnProp.Required])]
     [DBTypeMemo]
     FCategoryName: String;
 
     [Association([TAssociationProp.Lazy], CascadeTypeAll - [TCascadeType.Remove])]
-    [JoinColumn('PARENTID', [], 'CATEGORYID')]
     FParent: Proxy<TCategory>;
 
     [ManyValuedAssociation([TAssociationProp.Lazy], CascadeTypeAllRemoveOrphan)]
     FBooks: Proxy<TList<TBook>>;
-
-  private
-    function GetParentID: TCategory;
-    procedure SetParentID(const Value: TCategory);
     function GetBooks: TList<TBook>;
+    function GetParent: TCategory;
+    procedure SetParent(const Value: TCategory);
   public
     constructor Create; overload;
     constructor Create(AName: string); overload;
     destructor Destroy; override;
-    property CategoryID: Integer read FCategoryID write FCategoryID;
+    property ID: Integer read FID write FID;
     property CategoryName: String read FCategoryName write FCategoryName;
-    property Parent: TCategory read GetParentID write SetParentID;
+    property Parent: TCategory read GetParent write SetParent;
     property Books: TList<TBook> read GetBooks;
   end;
 
@@ -92,12 +85,12 @@ end;
 
 { TCategory}
 
-function TCategory.GetParentID: TCategory;
+function TCategory.GetParent: TCategory;
 begin
   Result := FParent.Value;
 end;
 
-procedure TCategory.SetParentID(const Value: TCategory);
+procedure TCategory.SetParent(const Value: TCategory);
 begin
   FParent.Value := Value;
 end;

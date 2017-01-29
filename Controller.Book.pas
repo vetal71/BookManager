@@ -4,19 +4,14 @@ interface
 
 uses
   System.Generics.Collections,
-  Aurelius.Engine.ObjectManager,
+  Controller.Base,
   Model.Entities;
 
 type
-  TBookController = class
-  private
-    FManager: TObjectManager;
+  TBookController = class(BaseController)
   public
     procedure DeleteBook(ABook: TBook);
     function GetAllBook: TList<TBook>;
-  public
-    constructor Create;
-    destructor Destroy; override;
   end;
 
 implementation
@@ -26,28 +21,17 @@ uses
 
 { TBookController }
 
-constructor TBookController.Create;
-begin
-  FManager := TDBConnection.GetInstance.CreateObjectManager;
-end;
-
 procedure TBookController.DeleteBook(ABook: TBook);
 begin
   if not FManager.IsAttached(ABook) then
-    ABook := FManager.Find<TBook>(ABook.BookID);
+    ABook := FManager.Find<TBook>(ABook.ID);
   FManager.Remove(ABook);
-end;
-
-destructor TBookController.Destroy;
-begin
-  FManager.Free;
-  inherited;
 end;
 
 function TBookController.GetAllBook: TList<TBook>;
 begin
   FManager.Clear;
-  Result := FManager.FindAll<TBook>;
+  Result := FManager.Find<TBook>.List;
 end;
 
 end.

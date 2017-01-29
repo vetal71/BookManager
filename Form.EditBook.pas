@@ -10,6 +10,7 @@ uses
   Vcl.ExtCtrls, cxControls, cxContainer, cxEdit, cxMaskEdit, cxDropDownEdit,
   cxTextEdit, cxLabel, Vcl.Buttons,
   Model.Entities,
+
   Controller.EditBook, System.ImageList, Vcl.ImgList;
 
 type
@@ -27,6 +28,7 @@ type
     procedure btnOKClick(Sender: TObject);
   private
     FController: TEditBookController;
+
     procedure LoadCategory;
   public
     procedure SetBook(BookID: Variant);
@@ -50,14 +52,17 @@ uses
 procedure TfrmEditBook.btnOKClick(Sender: TObject);
 var
   Book: TBook;
+  Category: TCategory;
 begin
   Book := FController.Book;
 
   with Book do begin
     BookName := edtBookName.Text;
     BookLink := edtFileLink.Text;
-    if cbbParentCategory.ItemIndex >= 0 then
+    if cbbParentCategory.ItemIndex >= 0 then begin
       Category := TCategory(cbbParentCategory.ItemObject);
+      Category.Books.Add(Book);
+    end;
   end;
 
   try
@@ -72,7 +77,7 @@ end;
 
 procedure TfrmEditBook.FormCreate(Sender: TObject);
 begin
-  FController := TEditBookController.Create;
+  FController := TEditBookController.Create(FManager);
   LoadCategory;
 end;
 
@@ -88,7 +93,7 @@ var
   C: TCategory;
 begin
   cbbParentCategory.Properties.Items.Clear;
-  Categories :=FController.GetCategories;
+  Categories := FController.GetCategories;
   try
     for C in Categories do
       cbbParentCategory.Properties.Items.AddObject(C.CategoryName, C);
@@ -107,7 +112,6 @@ begin
   edtBookName.Text := Book.BookName;
   edtFileLink.Text := Book.BookLink;
 
-  cbbParentCategory.ItemObject := Book.Category;
 end;
 
 procedure TfrmEditBook.SetParentCategory(Category: TCategory);

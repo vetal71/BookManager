@@ -9,7 +9,8 @@ uses
   dxSkinMetropolis, cxClasses, dxSkinsForm, Vcl.StdCtrls, cxButtons,
   Vcl.ExtCtrls,
   Controller.EditCategory, Model.Entities, cxControls, cxContainer, cxEdit,
-  cxMaskEdit, cxDropDownEdit, cxTextEdit, cxLabel, System.Generics.Collections;
+  cxMaskEdit, cxDropDownEdit, cxTextEdit, cxLabel, System.Generics.Collections,
+  System.ImageList, Vcl.ImgList;
 
 type
   TfrmEditCategory = class(TfrmBaseEditor)
@@ -22,10 +23,15 @@ type
     procedure btnOKClick(Sender: TObject);
   private
     FController: TEditCategoryController;
+    FCategoryId: Integer;
+  private
     procedure LoadCategory;
+    function GetCategoryID: Integer;
   public
     procedure SetCategory(CategoryID: Variant);
     procedure SetParentCategory(Category: TCategory);
+  public
+    property CategoryId: Integer read GetCategoryID;
   end;
 
 var
@@ -54,6 +60,7 @@ begin
 
   try
     FController.SaveCategory(Category);
+    FCategoryId := Category.ID;
     ModalResult := mrOk;
   except on E: Exception do begin
     ShowErrorFmt('Не удалось сохранить категорию "%s"'#10#13+'%s', [edtCategoryName.Text]);
@@ -64,7 +71,7 @@ end;
 
 procedure TfrmEditCategory.FormCreate(Sender: TObject);
 begin
-  FController := TEditCategoryController.Create;
+  FController := TEditCategoryController.Create(FManager);
   LoadCategory;
 end;
 
@@ -72,6 +79,11 @@ procedure TfrmEditCategory.FormDestroy(Sender: TObject);
 begin
   FController.Free;
   inherited;
+end;
+
+function TfrmEditCategory.GetCategoryID: Integer;
+begin
+  Result := FCategoryId;
 end;
 
 procedure TfrmEditCategory.LoadCategory;

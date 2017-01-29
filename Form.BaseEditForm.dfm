@@ -4,7 +4,7 @@ inherited frmBaseEditor: TfrmBaseEditor
   ClientHeight = 278
   ClientWidth = 632
   ExplicitWidth = 638
-  ExplicitHeight = 306
+  ExplicitHeight = 307
   PixelsPerInch = 96
   TextHeight = 20
   object bvlTop: TBevel [0]
