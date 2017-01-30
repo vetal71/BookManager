@@ -37,6 +37,7 @@ implementation
 procedure TWaiting.FormCreate(Sender: TObject);
 begin
   aiProgress.Active := True;
+  Sleep(2000);
 end;
 
 procedure TWaiting.FormClose(Sender: TObject; var Action: TCloseAction);

@@ -16,20 +16,28 @@ uses
 
 type
   TDBConnection = class sealed
+  class var
+    FDBFile: string;
   public
-    class function CreateConnection: IDBConnection;
+    class function CreateConnection(DBFile: string = ''): IDBConnection;
     class function CreateFactory: IDBConnectionFactory;
   end;
 
 implementation
+
 uses
   Variants, DB, SysUtils, TypInfo, Aurelius.Drivers.Base;
 
 { TDBConnection }
 
-class function TDBConnection.CreateConnection: IDBConnection;
+class function TDBConnection.CreateConnection(DBFile: string = ''): IDBConnection;
+const
+  cDefaultDB = 'BooksLibrary.db';
 begin
-  Result := TSQLiteNativeConnectionAdapter.Create('BooksLibrary.db');
+//  if DBFile = '' then
+//    DBFile := cDefaultDB;
+  FDBFile := DBFile;
+  Result := TSQLiteNativeConnectionAdapter.Create(FDBFile);
   (Result as TSQLiteNativeConnectionAdapter).EnableForeignKeys;
 end;
 
@@ -38,7 +46,7 @@ begin
   Result := TDBConnectionFactory.Create(
     function: IDBConnection
     begin
-      Result := CreateConnection;
+      Result := CreateConnection(FDBFile);
     end
   );
 end;

@@ -1,7 +1,7 @@
 program BookManager;
 
 uses
-  Vcl.Forms,
+  Vcl.Forms, Vcl.Controls,
   Common.Utils in 'Common.Utils.pas',
   Model.Entities in 'Model.Entities.pas',
   Controller.EditBook in 'Controller.EditBook.pas',
@@ -19,13 +19,23 @@ uses
   Form.AuditLogViewer in 'Form.AuditLogViewer.pas' {frmAuditLogViewer},
   Common.DatabaseUtils in 'Common.DatabaseUtils.pas',
   WaitForm in 'WaitForm.pas' {Waiting},
-  Controller.Base in 'Controller.Base.pas';
+  Controller.Base in 'Controller.Base.pas',
+  Form.ConnectionDialog in 'Form.ConnectionDialog.pas' {frmDlgConnection};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TfrmMain, frmMain);
-  Application.Run;
+  frmDlgConnection := TfrmDlgConnection.Create(Application, nil);
+  try
+    if frmDlgConnection.ShowModal = mrOk then begin
+      Application.CreateForm(TfrmMain, frmMain);
+      frmMain.DBFile := frmDlgConnection.DBFile;
+      Application.Run;
+    end;
+  finally
+    frmDlgConnection.Free;
+  end;
+
 end.

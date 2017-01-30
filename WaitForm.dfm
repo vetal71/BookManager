@@ -19,7 +19,6 @@ object Waiting: TWaiting
     Left = 0
     Top = 0
     Align = alTop
-    Caption = 'WaitTitle'
     Properties.Alignment.Horz = taCenter
     Properties.Alignment.Vert = taVCenter
     AnchorX = 184
@@ -38,7 +37,6 @@ object Waiting: TWaiting
     Left = 0
     Top = 72
     Align = alBottom
-    Caption = 'WaitMessage'
     Properties.Alignment.Horz = taCenter
     Properties.Alignment.Vert = taVCenter
     AnchorX = 184

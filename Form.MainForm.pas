@@ -52,18 +52,19 @@ type
     biSQLMonitor: TdxBarButton;
     bi3: TdxBarButton;
     biSQLAudit: TdxBarButton;
-    procedure FormCreate(Sender: TObject);
     procedure actExitExecute(Sender: TObject);
     procedure actRefreshLibraryExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
     Connection: IDBConnection;
   private
+    FDBFile: string;
     procedure ShowSqlMonitorForm;
     procedure ShowAuditLogForm;
     procedure ShowLibraryForm;
+    procedure SetDBFile(const Value: string);
   public
-    { Public declarations }
+    property DBFile: string read FDBFile write SetDBFile;
   end;
 
 var
@@ -88,21 +89,19 @@ begin
   FillData(Connection);
 end;
 
-procedure TfrmMain.FormCreate(Sender: TObject);
-begin
-
-  Connection := TDBConnection.CreateConnection;
-
-  UpdateDatabaseShema(Connection);
-  FillData(Connection);
-
-end;
-
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
   ShowSqlMonitorForm;
   ShowAuditLogForm;
   ShowLibraryForm;
+end;
+
+procedure TfrmMain.SetDBFile(const Value: string);
+begin
+  FDBFile := Value;
+  Connection := TDBConnection.CreateConnection(FDBFile);
+  UpdateDatabaseShema(Connection);
+  FillData(Connection);
 end;
 
 procedure TfrmMain.ShowAuditLogForm;
