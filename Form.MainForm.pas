@@ -41,13 +41,17 @@ type
     actRefreshLibrary: TAction;
     actExit: TAction;
     actSQLMonitor: TAction;
-    bsiService: TdxBarSubItem;
-    biSQLMonitor: TdxBarButton;
     btnSQLMonitor: TdxBarLargeButton;
     pgcMain: TcxPageControl;
     tsMainView: TcxTabSheet;
     tsAudit: TcxTabSheet;
     tsSQLMonitor: TcxTabSheet;
+    bi1: TdxBarButton;
+    bsiService: TdxBarSubItem;
+    bi2: TdxBarButton;
+    biSQLMonitor: TdxBarButton;
+    bi3: TdxBarButton;
+    biSQLAudit: TdxBarButton;
     procedure FormCreate(Sender: TObject);
     procedure actExitExecute(Sender: TObject);
     procedure actRefreshLibraryExecute(Sender: TObject);
@@ -81,7 +85,7 @@ end;
 
 procedure TfrmMain.actRefreshLibraryExecute(Sender: TObject);
 begin
-  // вызвать метод, который возвратит лог (количество обработанных файлов, записей)
+  FillData(Connection);
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
@@ -92,13 +96,6 @@ begin
   UpdateDatabaseShema(Connection);
   FillData(Connection);
 
-// Менеджер объектов
-//  FManager    := TDBConnection.GetInstance.CreateObjectManager;
-
-//  sbMain.Panels[2].Text := Format('Всего книг зарегистрировано в базе данных: %d', [ FManager.FindAll<TBook>.Count ]);
-
-  // Информация о БД
-  //sbMain.Panels[1].Text := Format('База данных: %s', [ TDBConnection.GetDBName ]);
 end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
@@ -128,6 +125,7 @@ begin
   F.Align := alClient;
   F.BorderStyle := bsNone;
   F.Show;
+  sbMain.Panels[1].Text := Format('Всего книг в библиотеке: %d штук', [F.BookCount]);
 end;
 
 procedure TfrmMain.ShowSqlMonitorForm;

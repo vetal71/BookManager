@@ -22,9 +22,6 @@ object Waiting: TWaiting
     Caption = 'WaitTitle'
     Properties.Alignment.Horz = taCenter
     Properties.Alignment.Vert = taVCenter
-    ExplicitLeft = 8
-    ExplicitTop = 8
-    ExplicitWidth = 64
     AnchorX = 184
     AnchorY = 11
   end
@@ -36,11 +33,6 @@ object Waiting: TWaiting
     Align = alClient
     PropertiesClassName = 'TdxActivityIndicatorHorizontalDotsProperties'
     Transparent = True
-    Visible = False
-    ExplicitLeft = -503
-    ExplicitTop = 98
-    ExplicitWidth = 1039
-    ExplicitHeight = 40
   end
   object WaitMessage: TcxLabel
     Left = 0
@@ -49,9 +41,6 @@ object Waiting: TWaiting
     Caption = 'WaitMessage'
     Properties.Alignment.Horz = taCenter
     Properties.Alignment.Vert = taVCenter
-    ExplicitLeft = 8
-    ExplicitTop = 8
-    ExplicitWidth = 9
     AnchorX = 184
     AnchorY = 83
   end

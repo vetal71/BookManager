@@ -4,7 +4,7 @@ inherited frmLibraryView: TfrmLibraryView
   ClientWidth = 1039
   OnShow = FormShow
   ExplicitWidth = 1055
-  ExplicitHeight = 654
+  ExplicitHeight = 653
   PixelsPerInch = 96
   TextHeight = 20
   object pnlLeft: TPanel [0]

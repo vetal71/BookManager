@@ -1,19 +1,19 @@
 inherited frmMain: TfrmMain
   Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075
-  ClientHeight = 479
-  ClientWidth = 885
+  ClientHeight = 556
+  ClientWidth = 939
   ShowHint = True
   WindowState = wsMaximized
   OnCreate = FormCreate
   OnShow = FormShow
-  ExplicitWidth = 901
-  ExplicitHeight = 518
+  ExplicitWidth = 955
+  ExplicitHeight = 594
   PixelsPerInch = 96
   TextHeight = 20
   object sbMain: TdxStatusBar [0]
     Left = 0
-    Top = 459
-    Width = 885
+    Top = 536
+    Width = 939
     Height = 20
     Panels = <
       item
@@ -39,15 +39,17 @@ inherited frmMain: TfrmMain
   object pgcMain: TcxPageControl [1]
     Left = 0
     Top = 71
-    Width = 885
-    Height = 388
+    Width = 939
+    Height = 465
     Align = alClient
     TabOrder = 5
     Properties.ActivePage = tsMainView
+    Properties.CloseButtonMode = cbmActiveTab
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 386
+    Properties.Options = [pcoAlwaysShowGoDialogButton, pcoCloseButton, pcoGoDialog, pcoGradient, pcoGradientClientArea, pcoRedrawOnResize]
+    ClientRectBottom = 463
     ClientRectLeft = 2
-    ClientRectRight = 883
+    ClientRectRight = 937
     ClientRectTop = 35
     object tsMainView: TcxTabSheet
       Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075
@@ -56,18 +58,10 @@ inherited frmMain: TfrmMain
     object tsAudit: TcxTabSheet
       Caption = #1040#1091#1076#1080#1090#1086#1088
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 513
     end
     object tsSQLMonitor: TcxTabSheet
       Caption = #1052#1086#1085#1080#1090#1086#1088#1080#1085#1075' '#1079#1072#1087#1088#1086#1089#1086#1074
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 513
     end
   end
   inherited sknMain: TdxSkinController
@@ -539,55 +533,6 @@ inherited frmMain: TfrmMain
         0000000000000000000000000000000000000000000000000000}
       ShowCaption = False
     end
-    object bsiService: TdxBarSubItem
-      Caption = #1057#1077#1088#1074#1080#1089
-      Category = 0
-      Visible = ivAlways
-      ItemLinks = <
-        item
-          Visible = True
-          ItemName = 'biSQLMonitor'
-        end>
-    end
-    object biSQLMonitor: TdxBarButton
-      Action = actSQLMonitor
-      Category = 0
-      Glyph.Data = {
-        36040000424D3604000000000000360000002800000010000000100000000100
-        2000000000000004000000000000000000000000000000000000000000000000
-        00000000000000000000000000040000000F000000110000000B000000040000
-        0001000000000000000000000000000000000000000000000000000000000000
-        000000000000000000000000000E431B10FF31130BE1190A0598030407420000
-        000C000000020000000000000000000000000000000000000000000000000000
-        000000000000000000000000000D673C29DCB8C7D2FF7789A3FF224084FF040F
-        34960000000F0000000200000000000000000000000000000000000000000000
-        000000000000000000000000000841261A91869AB3FFC7E3F6FF1B65B9FF286B
-        ABFF041237950000000E00000002000000000000000000000000000000000000
-        00000000000000000000000000031013163E458BC6FFDDFEFDFF4DB4E6FF1B67
-        BAFF2E73B1FF051439940000000D000000020000000000000000000000000000
-        0000000000000000000000000001000000081B44628D439FD5FFDDFEFDFF55C0
-        ECFF1D6ABCFF337BB6FF06163B920000000C0000000200000000000000080000
-        000C0000000D0000000D0000000D0000000E000000161B44629248A5D8FFDDFE
-        FDFF5DCBF2FF206EBFFF3883BCFF07193E910000000A00000002735146BFA070
-        61FF9F6F61FF9F6F60FF9E6F60FFA07161FFB89489FFC8B0A9FF7A98B2FF4BAB
-        DAFFDDFEFDFF64D5F7FF2474C1FF3C8BC1FF071B418E00000006A47667FFF9F6
-        F4FFF6F5F3FFF7F5F4FFF4F3F1FFF7F5F4FFF1F0EEFFF2F1EFFFF3F2F1FF8CB4
-        D1FF4EAFDDFFDDFEFDFF6BDEFBFF287AC5FF15438DFF00000008A87C6DFFF5F3
-        F2FF643C2CFFE5E4E3FF633B2BFFEBEAE9FF643C2CFF643E2DFFD7CFCBFFF6F5
-        F4FF92B9D5FF51B2DFFFDDFEFDFF4CA7D7FF0F2B4F8800000004AD8274FFF4F3
-        F2FF68402FFF673F2FFF673F2FFFE9E8E6FF663E2EFFDEDCDBFF68402FFFF7F5
-        F4FFF6F3EFFF93BBD8FF327FBFFF163A5A8B0000000500000001B1887AFFF6F5
-        F4FF6E4433FFE9E7E6FF6D4432FFECEBEAFF6C4331FF6C4231FFB3A19AFFF6F5
-        F3FFF9F4EFFFF9F6F3FFD2BBB4FF0000000E0000000100000000B78F80FFF8F7
-        F6FF724836FFCFC4BFFF714836FFF1EFEEFF714635FFE8E6E5FF704635FFF7F6
-        F5FFF8F1ECFFF8F1ECFFAF8576FF0000000A0000000000000000BB9587FFFBFA
-        F9FFD8CDC8FF764A3BFFD7CBC6FFF7F6F5FF754B39FF754B39FFD6CAC5FFFBFA
-        F9FFF8F2EEFFF8F2EDFFB38B7CFF000000090000000000000000C09C8DFFFDFB
-        F9FFFDFDFCFFFBFBFAFFFDFDFCFFFDFDFCFFFAFAF9FFFAFAF9FFFCFBFBFFFDFA
-        F8FFFBF9F7FFFBF9F7FFB89282FF00000008000000000000000091786DC1C4A1
-        92FFC3A091FFC3A091FFC29F90FFC19D8FFFC09D8EFFC09C8DFFBF9B8CFFBF9A
-        8BFFBE9A8BFFBD998AFF8C7064C2000000050000000000000000}
-    end
     object btnSQLMonitor: TdxBarLargeButton
       Action = actSQLMonitor
       Category = 0
@@ -723,6 +668,50 @@ inherited frmMain: TfrmMain
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000}
       ShowCaption = False
+    end
+    object bi1: TdxBarButton
+      Caption = 'New Button'
+      Category = 0
+      Hint = 'New Button'
+      Visible = ivAlways
+    end
+    object bsiService: TdxBarSubItem
+      Caption = #1057#1077#1088#1074#1080#1089
+      Category = 0
+      Visible = ivAlways
+      ItemLinks = <
+        item
+          Visible = True
+          ItemName = 'biSQLMonitor'
+        end
+        item
+          Visible = True
+          ItemName = 'biSQLAudit'
+        end>
+    end
+    object bi2: TdxBarButton
+      Caption = 'New Button'
+      Category = 0
+      Hint = 'New Button'
+      Visible = ivAlways
+    end
+    object biSQLMonitor: TdxBarButton
+      Caption = 'SQL '#1084#1086#1085#1080#1090#1086#1088
+      Category = 0
+      Hint = 'SQL '#1084#1086#1085#1080#1090#1086#1088
+      Visible = ivAlways
+    end
+    object bi3: TdxBarButton
+      Caption = 'New Button'
+      Category = 0
+      Hint = 'New Button'
+      Visible = ivAlways
+    end
+    object biSQLAudit: TdxBarButton
+      Caption = 'SQL '#1072#1091#1076#1080#1090
+      Category = 0
+      Hint = 'SQL '#1072#1091#1076#1080#1090
+      Visible = ivAlways
     end
   end
   object acList: TActionList

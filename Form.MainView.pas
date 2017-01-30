@@ -68,8 +68,11 @@ type
     FOwnsManager: Boolean;
   private
     procedure LoadData(SelectedId: Integer = 0);
+    function GetBookCount: Integer;
   public
     constructor Create(AOwner: TComponent; AManager: TObjectManager; AOwnsManager: Boolean); reintroduce;
+
+    property BookCount: Integer read GetBookCount;
   end;
 
 var
@@ -223,6 +226,11 @@ procedure TfrmLibraryView.FormShow(Sender: TObject);
 begin
   inherited;
   LoadData;
+end;
+
+function TfrmLibraryView.GetBookCount: Integer;
+begin
+  Result := FManager.Find<TBook>.List.Count;
 end;
 
 procedure TfrmLibraryView.LoadData(SelectedId: Integer);

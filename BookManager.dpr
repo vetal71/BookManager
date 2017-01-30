@@ -27,8 +27,5 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TfrmLibraryView, frmLibraryView);
-  Application.CreateForm(TfrmAuditLogViewer, frmAuditLogViewer);
-  Application.CreateForm(TWaiting, Waiting);
   Application.Run;
 end.
