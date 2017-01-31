@@ -37,7 +37,6 @@ implementation
 procedure TWaiting.FormCreate(Sender: TObject);
 begin
   aiProgress.Active := True;
-  Sleep(2000);
 end;
 
 procedure TWaiting.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -66,6 +65,7 @@ begin
   T.Start;
 
   WaitForm.WaitTitle.Caption := ATitle;
+  WaitForm.Update;
   WaitForm.ShowModal;
 
   DoHandleException;
@@ -78,6 +78,8 @@ begin
   begin
     if (Assigned(WaitForm)) then
     begin
+      WaitForm.aiProgress.Active := True;
+      WaitForm.aiProgress.Update;
       WaitForm.WaitMessage.Caption := AMessage;
       WaitForm.Update;
     end;

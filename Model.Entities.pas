@@ -30,10 +30,17 @@ type
     [DBTypeMemo]
     FBookLink: Nullable<String>;
 
+    [Association([TAssociationProp.Lazy], CascadeTypeAll - [TCascadeType.Remove])]
+    [JoinColumn('BOOKS_CATEGORY_ID', [], 'ID')]
+    FBooksCategory: Proxy<TCategory>;
+    function GetBooksCategory: TCategory;
+    procedure SetBooksCategory(const Value: TCategory);
+
   public
     property ID: Integer read FID write FID;
     property BookName: String read FBookName write FBookName;
     property BookLink: Nullable<String> read FBookLink write FBookLink;
+    property BooksCategory: TCategory read GetBooksCategory write SetBooksCategory;
   public
     constructor Create(ABookName: string); overload;
     constructor Create(ABookName: string; ABookLink: Nullable<string>); overload;
@@ -52,7 +59,7 @@ type
     [Association([TAssociationProp.Lazy], CascadeTypeAll - [TCascadeType.Remove])]
     FParent: Proxy<TCategory>;
 
-    [ManyValuedAssociation([TAssociationProp.Lazy], CascadeTypeAllRemoveOrphan)]
+    [ManyValuedAssociation([TAssociationProp.Lazy], Aurelius.Mapping.Metadata.CascadeTypeAllRemoveOrphan)]
     FBooks: Proxy<TList<TBook>>;
     function GetBooks: TList<TBook>;
     function GetParent: TCategory;
@@ -81,6 +88,16 @@ constructor TBook.Create(ABookName: string; ABookLink: Nullable<string>);
 begin
   Create(ABookName);
   FBookLink := ABookLink;
+end;
+
+function TBook.GetBooksCategory: TCategory;
+begin
+  Result := FBooksCategory.Value;
+end;
+
+procedure TBook.SetBooksCategory(const Value: TCategory);
+begin
+  FBooksCategory.Value := Value;
 end;
 
 { TCategory}

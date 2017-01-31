@@ -34,8 +34,6 @@ class function TDBConnection.CreateConnection(DBFile: string = ''): IDBConnectio
 const
   cDefaultDB = 'BooksLibrary.db';
 begin
-//  if DBFile = '' then
-//    DBFile := cDefaultDB;
   FDBFile := DBFile;
   Result := TSQLiteNativeConnectionAdapter.Create(FDBFile);
   (Result as TSQLiteNativeConnectionAdapter).EnableForeignKeys;

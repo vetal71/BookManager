@@ -4,10 +4,8 @@ inherited frmEditCategory: TfrmEditCategory
   ClientWidth = 549
   Constraints.MinHeight = 210
   Constraints.MinWidth = 550
-  OnCreate = FormCreate
-  OnDestroy = FormDestroy
   ExplicitWidth = 555
-  ExplicitHeight = 211
+  ExplicitHeight = 210
   PixelsPerInch = 96
   TextHeight = 20
   inherited bvlTop: TBevel
@@ -26,21 +24,23 @@ inherited frmEditCategory: TfrmEditCategory
     Top = 143
     Width = 549
     ExplicitTop = 143
-    ExplicitWidth = 544
+    ExplicitWidth = 549
+    DesignSize = (
+      549
+      39)
     inherited btnOK: TcxButton
       Left = 298
-      OnClick = btnOKClick
-      ExplicitLeft = 293
+      ExplicitLeft = 298
     end
     inherited btnCancel: TcxButton
       Left = 423
-      ExplicitLeft = 418
+      ExplicitLeft = 423
     end
   end
   inherited pnlHeader: TPanel
     Width = 549
     Height = 41
-    ExplicitWidth = 544
+    ExplicitWidth = 549
     ExplicitHeight = 41
   end
   inherited pnlEditor: TPanel
@@ -50,6 +50,9 @@ inherited frmEditCategory: TfrmEditCategory
     ExplicitTop = 43
     ExplicitWidth = 549
     ExplicitHeight = 98
+    DesignSize = (
+      549
+      98)
     object lblCategoryName: TcxLabel
       Left = 16
       Top = 16
@@ -62,24 +65,35 @@ inherited frmEditCategory: TfrmEditCategory
       Caption = #1055#1088#1080#1085#1072#1076#1083#1077#1078#1080#1090' '#1082' '#1082#1072#1090#1077#1075#1086#1088#1080#1080':'
       Transparent = True
     end
-    object edtCategoryName: TcxTextEdit
+    object edtCategoryName: TcxDBTextEdit
       Left = 136
       Top = 15
       Anchors = [akLeft, akTop, akRight]
+      DataBinding.DataField = 'CategoryName'
+      DataBinding.DataSource = dsCategories
       TabOrder = 2
       Width = 400
     end
-    object cbbParentCategory: TcxComboBox
+    object cbbParentCategory: TcxDBLookupComboBox
       Left = 211
       Top = 55
       Anchors = [akLeft, akTop, akRight]
-      Properties.AutoSelect = False
+      DataBinding.DataField = 'Parent'
+      DataBinding.DataSource = dsCategories
+      Properties.GridMode = True
+      Properties.KeyFieldNames = 'Self'
+      Properties.ListColumns = <
+        item
+          FieldName = 'CategoryName'
+        end>
+      Properties.ListSource = dsParents
       TabOrder = 3
       Width = 325
     end
   end
   inherited ilSmall: TcxImageList
     FormatVersion = 1
+    DesignInfo = 2621711
     ImageInfo = <
       item
         Image.Data = {
@@ -299,6 +313,7 @@ inherited frmEditCategory: TfrmEditCategory
   end
   inherited ilEdit: TcxImageList
     FormatVersion = 1
+    DesignInfo = 2621753
     ImageInfo = <
       item
         Image.Data = {
@@ -472,5 +487,121 @@ inherited frmEditCategory: TfrmEditCategory
           0000000000000000000000000000000000000000000000000000000000000000
           0000}
       end>
+  end
+  object adsCategories: TAureliusDataset
+    FieldDefs = <
+      item
+        Name = 'Self'
+        Attributes = [faReadonly]
+        DataType = ftVariant
+      end
+      item
+        Name = 'ID'
+        Attributes = [faReadonly, faRequired]
+        DataType = ftInteger
+      end
+      item
+        Name = 'CategoryName'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 255
+      end
+      item
+        Name = 'Parent'
+        DataType = ftVariant
+      end
+      item
+        Name = 'Books'
+        Attributes = [faReadonly]
+        DataType = ftDataSet
+      end>
+    IncludeUnmappedObjects = True
+    Left = 96
+    Top = 24
+    DesignClass = 'Model.Entities.TCategory'
+    object adsCategoriesSelf: TAureliusEntityField
+      FieldName = 'Self'
+      ReadOnly = True
+    end
+    object adsCategoriesID: TIntegerField
+      FieldName = 'ID'
+      ReadOnly = True
+      Required = True
+    end
+    object adsCategoriesCategoryName: TStringField
+      FieldName = 'CategoryName'
+      Required = True
+      Size = 255
+    end
+    object adsCategoriesParent: TAureliusEntityField
+      FieldName = 'Parent'
+    end
+    object adsCategoriesBooks: TDataSetField
+      FieldName = 'Books'
+      ReadOnly = True
+    end
+  end
+  object dsCategories: TDataSource
+    DataSet = adsCategories
+    Left = 97
+    Top = 81
+  end
+  object adsParents: TAureliusDataset
+    FieldDefs = <
+      item
+        Name = 'Self'
+        Attributes = [faReadonly]
+        DataType = ftVariant
+      end
+      item
+        Name = 'ID'
+        Attributes = [faReadonly, faRequired]
+        DataType = ftInteger
+      end
+      item
+        Name = 'CategoryName'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 255
+      end
+      item
+        Name = 'Parent'
+        DataType = ftVariant
+      end
+      item
+        Name = 'Books'
+        Attributes = [faReadonly]
+        DataType = ftDataSet
+      end>
+    IncludeUnmappedObjects = False
+    Left = 160
+    Top = 24
+    DesignClass = 'Model.Entities.TCategory'
+    object adsParentsSelf: TAureliusEntityField
+      FieldName = 'Self'
+      ReadOnly = True
+    end
+    object adsParentsID: TIntegerField
+      FieldName = 'ID'
+      ReadOnly = True
+      Required = True
+    end
+    object adsParentsCategoryName: TStringField
+      FieldName = 'CategoryName'
+      Required = True
+      Size = 255
+    end
+    object adsParentsParent: TAureliusEntityField
+      FieldName = 'Parent'
+    end
+    object adsParentsBooks: TDataSetField
+      FieldName = 'Books'
+      ReadOnly = True
+    end
+  end
+  object dsParents: TDataSource
+    DataSet = adsParents
+    Left = 161
+    Top = 81
   end
 end

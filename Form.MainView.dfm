@@ -2,6 +2,7 @@ inherited frmLibraryView: TfrmLibraryView
   Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072
   ClientHeight = 615
   ClientWidth = 1039
+  OnDestroy = FormDestroy
   OnShow = FormShow
   ExplicitWidth = 1055
   ExplicitHeight = 653
@@ -30,6 +31,7 @@ inherited frmLibraryView: TfrmLibraryView
         Hint = #1044#1086#1073#1072#1074#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = 'btnAddCategory'
         ImageIndex = 0
+        OnClick = btnAddCategoryClick
       end
       object btnEditCategory: TToolButton
         Left = 23
@@ -37,6 +39,7 @@ inherited frmLibraryView: TfrmLibraryView
         Hint = #1056#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = 'btnEditCategory'
         ImageIndex = 2
+        OnClick = btnEditCategoryClick
       end
       object btnDelCategory: TToolButton
         Left = 46
@@ -44,12 +47,14 @@ inherited frmLibraryView: TfrmLibraryView
         Hint = #1059#1076#1072#1083#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = 'btnDelCategory'
         ImageIndex = 1
+        OnClick = btnDelCategoryClick
       end
       object btnRefresh: TToolButton
         Left = 69
         Top = 0
         Caption = 'btnRefreshCategory'
         ImageIndex = 3
+        OnClick = btnRefreshClick
       end
     end
     object lstCategories: TcxDBTreeList
@@ -66,6 +71,10 @@ inherited frmLibraryView: TfrmLibraryView
       DataController.ParentField = 'Parent'
       DataController.KeyField = 'Self'
       Navigator.Buttons.CustomButtons = <>
+      OptionsBehavior.ExpandOnDblClick = False
+      OptionsBehavior.IncSearch = True
+      OptionsData.Editing = False
+      OptionsData.Deleting = False
       OptionsSelection.CellSelect = False
       RootValue = -1
       TabOrder = 1
@@ -116,6 +125,7 @@ inherited frmLibraryView: TfrmLibraryView
       Align = alClient
       TabOrder = 0
       object grdBooksView: TcxGridDBTableView
+        OnDblClick = grdBooksViewDblClick
         Navigator.Buttons.CustomButtons = <>
         FindPanel.InfoText = #1042#1074#1077#1076#1080#1090#1077' '#1090#1077#1082#1089#1090' '#1076#1083#1103' '#1087#1086#1080#1089#1082#1072'...'
         DataController.DataSource = dsBooks
@@ -177,6 +187,7 @@ inherited frmLibraryView: TfrmLibraryView
         Hint = #1044#1086#1073#1072#1074#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = 'btnAdd'
         ImageIndex = 0
+        OnClick = btnAddBookClick
       end
       object btnEditBook: TToolButton
         Left = 23
@@ -184,6 +195,7 @@ inherited frmLibraryView: TfrmLibraryView
         Hint = #1056#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = 'btnEdit'
         ImageIndex = 2
+        OnClick = btnEditBookClick
       end
       object btnDelBook: TToolButton
         Left = 46
@@ -191,12 +203,14 @@ inherited frmLibraryView: TfrmLibraryView
         Hint = #1059#1076#1072#1083#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = 'btnDel'
         ImageIndex = 1
+        OnClick = btnDelBookClick
       end
       object btnRefreshBook: TToolButton
         Left = 69
         Top = 0
         Caption = 'btnRefreshBook'
         ImageIndex = 3
+        OnClick = btnRefreshBookClick
       end
     end
   end
@@ -206,24 +220,113 @@ inherited frmLibraryView: TfrmLibraryView
   inherited ilEdit: TcxImageList
     FormatVersion = 1
   end
-  object CategoriesDS: TAureliusDataset
-    FieldDefs = <>
-    Left = 416
-    Top = 257
+  object adsCategories: TAureliusDataset
+    FieldDefs = <
+      item
+        Name = 'Self'
+        Attributes = [faReadonly]
+        DataType = ftVariant
+      end
+      item
+        Name = 'ID'
+        Attributes = [faReadonly, faRequired]
+        DataType = ftInteger
+      end
+      item
+        Name = 'CategoryName'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 255
+      end
+      item
+        Name = 'Parent'
+        DataType = ftVariant
+      end
+      item
+        Name = 'Books'
+        Attributes = [faReadonly]
+        DataType = ftDataSet
+      end>
+    IncludeUnmappedObjects = True
+    Left = 80
+    Top = 88
+    DesignClass = 'Model.Entities.TCategory'
+    object adsCategoriesSelf: TAureliusEntityField
+      FieldName = 'Self'
+      ReadOnly = True
+    end
+    object adsCategoriesID: TIntegerField
+      FieldName = 'ID'
+      ReadOnly = True
+      Required = True
+    end
+    object adsCategoriesCategoryName: TStringField
+      FieldName = 'CategoryName'
+      Required = True
+      Size = 255
+    end
+    object adsCategoriesParent: TAureliusEntityField
+      FieldName = 'Parent'
+    end
+    object adsCategoriesBooks: TDataSetField
+      FieldName = 'Books'
+      ReadOnly = True
+    end
+  end
+  object adsBooks: TAureliusDataset
+    FieldDefs = <
+      item
+        Name = 'Self'
+        Attributes = [faReadonly]
+        DataType = ftVariant
+      end
+      item
+        Name = 'ID'
+        Attributes = [faReadonly, faRequired]
+        DataType = ftInteger
+      end
+      item
+        Name = 'BookName'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 255
+      end
+      item
+        Name = 'BookLink'
+        DataType = ftString
+        Size = 255
+      end>
+    IncludeUnmappedObjects = False
+    Left = 160
+    Top = 88
+    DesignClass = 'Model.Entities.TBook'
+    object adsBooksSelf: TAureliusEntityField
+      FieldName = 'Self'
+      ReadOnly = True
+    end
+    object adsBooksID: TIntegerField
+      FieldName = 'ID'
+      ReadOnly = True
+      Required = True
+    end
+    object adsBooksBookName: TStringField
+      FieldName = 'BookName'
+      Required = True
+      Size = 255
+    end
+    object adsBooksBookLink: TStringField
+      FieldName = 'BookLink'
+      Size = 255
+    end
   end
   object dsCategories: TDataSource
-    DataSet = CategoriesDS
-    Left = 509
-    Top = 257
-  end
-  object BooksDS: TAureliusDataset
-    FieldDefs = <>
-    Left = 416
-    Top = 313
+    DataSet = adsCategories
+    Left = 81
+    Top = 145
   end
   object dsBooks: TDataSource
-    DataSet = BooksDS
-    Left = 509
-    Top = 313
+    DataSet = adsBooks
+    Left = 161
+    Top = 144
   end
 end

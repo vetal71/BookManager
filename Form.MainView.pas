@@ -15,10 +15,8 @@ uses
   Aurelius.Bind.Dataset,
   System.Generics.Collections,
   Aurelius.Engine.ObjectManager,
-
-  Model.Entities,
-  Controller.Category,
-  Controller.Book;
+  ConnectionModule,
+  Model.Entities;
 
 type
   TfrmLibraryView = class(TfrmBase)
@@ -44,27 +42,36 @@ type
     btnEditBook: TToolButton;
     btnDelBook: TToolButton;
     btnRefreshBook: TToolButton;
-    CategoriesDS: TAureliusDataset;
+    adsCategories: TAureliusDataset;
+    adsCategoriesSelf: TAureliusEntityField;
+    adsCategoriesID: TIntegerField;
+    adsCategoriesCategoryName: TStringField;
+    adsCategoriesParent: TAureliusEntityField;
+    adsCategoriesBooks: TDataSetField;
+    adsBooks: TAureliusDataset;
+    adsBooksSelf: TAureliusEntityField;
+    adsBooksID: TIntegerField;
+    adsBooksBookName: TStringField;
+    adsBooksBookLink: TStringField;
     dsCategories: TDataSource;
-    BooksDS: TAureliusDataset;
     dsBooks: TDataSource;
     procedure btnAddCategoryClick(Sender: TObject);
     procedure btnEditCategoryClick(Sender: TObject);
     procedure btnDelCategoryClick(Sender: TObject);
     procedure btnRefreshClick(Sender: TObject);
-    procedure BooksDSBeforeOpen(DataSet: TDataSet);
     procedure btnAddBookClick(Sender: TObject);
     procedure btnEditBookClick(Sender: TObject);
     procedure btnRefreshBookClick(Sender: TObject);
     procedure btnDelBookClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure grdBooksViewDblClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     class var
       FInstance: TfrmLibraryView;
   private
     FManager : TObjectManager;
     FCategories: TList<TCategory>;
-    FCategoryController: TCategoryController;
     FOwnsManager: Boolean;
   private
     procedure LoadData(SelectedId: Integer = 0);
@@ -81,7 +88,6 @@ var
 implementation
 
 uses
-  Common.DBConnection,
   Aurelius.Criteria.Base,
   Common.Utils,
   Form.EditCategory,
@@ -93,125 +99,113 @@ uses
 
 resourcestring
   rsConfirmDeleteRecord = 'Вы действительно хотите удалить %s "%s"?';
+  rsErrorDeleteRecord   = 'Не удалось удалить запись "%s"';
 
 { TfrmLibraryView }
 
-procedure TfrmLibraryView.BooksDSBeforeOpen(DataSet: TDataSet);
-begin
-  //ShowInfo('Метод BeforeOpen');
-end;
-
 procedure TfrmLibraryView.btnAddBookClick(Sender: TObject);
-var
-  frmEditBook: TfrmEditBook;
 begin
-  frmEditBook := TfrmEditBook.Create(Self, FManager);
-  try
-    frmEditBook.Header := 'Новая книга';
-    frmEditBook.SetParentCategory(CategoriesDS.Current<TCategory>);
-    if frmEditBook.ShowModal = mrOk then begin
-      LoadData(CategoriesDS.Current<TCategory>.ID);
-    end;
-  finally
-    frmEditBook.Free;
-  end;
+  //
 end;
 
 procedure TfrmLibraryView.btnAddCategoryClick(Sender: TObject);
 var
-  frmEditCategory: TfrmEditCategory;
+  Category: TCategory;
+  Book: TBook;
 begin
-  // Новая категория
-  frmEditCategory := TfrmEditCategory.Create(Self, FManager);
+  Category := TCategory.Create;
   try
-    frmEditCategory.Header := 'Новая категория книг';
-    frmEditCategory.SetParentCategory(CategoriesDS.Current<TCategory>);
-    if frmEditCategory.ShowModal = mrOk then begin
-      LoadData(frmEditCategory.CategoryId);
+    Category.Parent := adsCategories.Current<TCategory>;
+    if TfrmEditCategory.Edit(Category, FManager) then begin
+      FManager.Save(Category);
     end;
   finally
-    frmEditCategory.Free;
+    for Book in Category.Books do
+      if not FManager.IsAttached(Book) then
+        Book.Free;
+
+    if not FManager.IsAttached(Category) then
+      Category.Free;
   end;
+  LoadData(Category.ID);
 end;
 
 procedure TfrmLibraryView.btnDelBookClick(Sender: TObject);
 var
-  Book: TBook;
-  Msg: string;
-  BookController: TBookController;
+  BookName: string;
 begin
-  Book := BooksDS.Current<TBook>;
-  if ShowConfirmFmt(rsConfirmDeleteRecord, ['книгу', Book.BookName]) then
-  begin
-    BookController := TBookController.Create(FManager);
+  BookName := adsBooks.Current<TBook>.BookName;
+  if ShowConfirmFmt(rsConfirmDeleteRecord, ['книгу', BookName]) then begin
     try
-      BookController.DeleteBook(Book);
-      LoadData(CategoriesDS.Current<TCategory>.ID);
-    finally
-      BookController.Free;
+      adsBooks.Delete;
+      LoadData(adsCategories.Current<TCategory>.ID);
+    except
+      ShowErrorFmt(rsErrorDeleteRecord, [BookName]);
     end;
   end;
 end;
 
 procedure TfrmLibraryView.btnDelCategoryClick(Sender: TObject);
 var
-  Category: TCategory;
-  Msg: string;
+  CategoryName: string;
 begin
-  Category := CategoriesDS.Current<TCategory>;
-
-  if ShowConfirmFmt(rsConfirmDeleteRecord, ['категорию', Category.CategoryName]) then
+  CategoryName := adsCategories.Current<TCategory>.CategoryName;
+  if ShowConfirmFmt(rsConfirmDeleteRecord, ['категорию', CategoryName]) then
   begin
-    FCategoryController.DeleteCategory(Category);
-    LoadData(CategoriesDS.Current<TCategory>.ID);
+    try
+      LoadData(adsCategories.Current<TCategory>.ID);
+    except
+      ShowErrorFmt(rsErrorDeleteRecord, [CategoryName]);
+    end;
   end;
 end;
 
 procedure TfrmLibraryView.btnEditBookClick(Sender: TObject);
 var
-  frmEditBook: TfrmEditBook;
   Book: TBook;
+  Edit: Boolean;
 begin
-  Book := BooksDS.Current<TBook>;
-  frmEditBook := TfrmEditBook.Create(Self, FManager);
+  Book := adsBooks.Current<TBook>;
+  if Book = nil then Exit;
   try
-    frmEditBook.Header := Format('Редактирование книги: %s', [Book.BookName]);
-    frmEditBook.SetParentCategory(CategoriesDS.Current<TCategory>);
-    if frmEditBook.ShowModal = mrOk then begin
-      LoadData(CategoriesDS.Current<TCategory>.ID);
+    Edit := TfrmEditBook.Edit(Book, FManager);
+    if Edit then begin
+      FManager.Flush(Book);
     end;
   finally
-    frmEditBook.Free;
+    if not FManager.IsAttached(Book) then
+      Book.Free;
   end;
+  if Edit then LoadData(Book.BooksCategory.ID);
 end;
 
 procedure TfrmLibraryView.btnEditCategoryClick(Sender: TObject);
 var
-  frmEditCategory: TfrmEditCategory;
   Category: TCategory;
+  Book: TBook;
+  Edit: Boolean;
 begin
-  // Изменить категорию
-  Category := CategoriesDS.Current<TCategory>;
-  frmEditCategory := TfrmEditCategory.Create(Self, FManager);
-  try
-    frmEditCategory.SetCategory(Category.ID);
-    frmEditCategory.Header := Format('Редактирование категории: %s', [Category.CategoryName]);
-    if frmEditCategory.ShowModal = mrOk then begin
-      LoadData(CategoriesDS.Current<TCategory>.ID);
-    end;
-  finally
-    frmEditCategory.Free;
+  Category := adsCategories.Current<TCategory>;
+  if Category = nil then Exit;
+  Edit := TfrmEditCategory.Edit(Category, FManager);
+  if Edit then begin
+    FManager.Flush(Category);
+  end else begin
+    for Book in Category.Books do
+      if not FManager.IsAttached(Book) then
+        Book.Free;
   end;
+  if Edit then LoadData(Category.ID);
 end;
 
 procedure TfrmLibraryView.btnRefreshBookClick(Sender: TObject);
 begin
-  LoadData(CategoriesDS.Current<TCategory>.ID);
+  LoadData(adsCategories.Current<TCategory>.ID);
 end;
 
 procedure TfrmLibraryView.btnRefreshClick(Sender: TObject);
 begin
-  LoadData(CategoriesDS.Current<TCategory>.ID);
+  LoadData(adsCategories.Current<TCategory>.ID);
 end;
 
 constructor TfrmLibraryView.Create(AOwner: TComponent; AManager: TObjectManager;
@@ -220,6 +214,16 @@ begin
   inherited Create(AOwner);
   FManager     := AManager;
   FOwnsManager := AOwnsManager;
+end;
+
+procedure TfrmLibraryView.FormDestroy(Sender: TObject);
+begin
+  with dm do begin
+    adsCategories.Close;
+    adsBooks.Close;
+  end;
+  if FOwnsManager then
+    FManager.Free;
 end;
 
 procedure TfrmLibraryView.FormShow(Sender: TObject);
@@ -233,24 +237,39 @@ begin
   Result := FManager.Find<TBook>.List.Count;
 end;
 
+procedure TfrmLibraryView.grdBooksViewDblClick(Sender: TObject);
+var
+  FileName: string;
+begin
+  // вызов программы-читалки
+  with dm do begin
+    if adsBooks.Current<TBook> = nil then Exit;
+    FileName := adsBooks.Current<TBook>.BookLink;
+  end;
+
+  ShellExecute(0, '', FileName);
+end;
+
 procedure TfrmLibraryView.LoadData(SelectedId: Integer);
 var
   Criteria: TCriteria;
 begin
-  if (SelectedId = 0) and (CategoriesDS.Current<TCategory> <> nil) then
-    SelectedId := CategoriesDS.Current<TCategory>.ID;
-  CategoriesDS.Close;
-  BooksDS.Close;
+  if (SelectedId = 0) and (adsCategories.Current<TCategory> <> nil) then
+    SelectedId := adsCategories.Current<TCategory>.ID;
+  adsCategories.Close;
+  adsBooks.Close;
   FManager.Clear;
 
   Criteria := FManager.Find<TCategory>.OrderBy('ID');
-  CategoriesDS.SetSourceCriteria(Criteria);
+  adsCategories.SetSourceCriteria(Criteria);
 
-  CategoriesDS.Open;
+  adsCategories.Open;
   if SelectedId <> 0 then
-    CategoriesDS.Locate('ID', SelectedId, []);
-  BooksDS.DatasetField := (CategoriesDS.FieldByName('Books') as TDataSetField);
-  BooksDS.Open;
+    adsCategories.Locate('ID', SelectedId, []);
+  adsBooks.DatasetField := (adsCategories.FieldByName('Books') as TDataSetField);
+  adsBooks.Open;
+
+  lstCategories.FullExpand;
 end;
 
 end.

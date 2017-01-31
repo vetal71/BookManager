@@ -4,7 +4,7 @@ inherited frmBaseEditor: TfrmBaseEditor
   ClientHeight = 278
   ClientWidth = 632
   ExplicitWidth = 638
-  ExplicitHeight = 307
+  ExplicitHeight = 306
   PixelsPerInch = 96
   TextHeight = 20
   object bvlTop: TBevel [0]
@@ -41,6 +41,7 @@ inherited frmBaseEditor: TfrmBaseEditor
       Anchors = [akTop, akRight, akBottom]
       Caption = 'OK'
       TabOrder = 0
+      OnClick = btnOKClick
     end
     object btnCancel: TcxButton
       Left = 506

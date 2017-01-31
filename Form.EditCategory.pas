@@ -8,30 +8,40 @@ uses
   cxLookAndFeels, cxLookAndFeelPainters, Vcl.Menus, dxSkinsCore,
   dxSkinMetropolis, cxClasses, dxSkinsForm, Vcl.StdCtrls, cxButtons,
   Vcl.ExtCtrls,
-  Controller.EditCategory, Model.Entities, cxControls, cxContainer, cxEdit,
-  cxMaskEdit, cxDropDownEdit, cxTextEdit, cxLabel, System.Generics.Collections,
-  System.ImageList, Vcl.ImgList;
+  Model.Entities, cxControls, cxContainer, cxEdit,
+  cxMaskEdit, cxDropDownEdit, cxTextEdit, cxLabel,
+  System.Generics.Collections,
+  Aurelius.Bind.Dataset,
+  Aurelius.Engine.ObjectManager,
+  System.ImageList, Vcl.ImgList, Data.DB, cxLookupEdit, cxDBLookupEdit,
+  cxDBLookupComboBox, cxDBEdit;
 
 type
   TfrmEditCategory = class(TfrmBaseEditor)
     lblCategoryName: TcxLabel;
     lblParentCategory: TcxLabel;
-    edtCategoryName: TcxTextEdit;
-    cbbParentCategory: TcxComboBox;
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
+    edtCategoryName: TcxDBTextEdit;
+    cbbParentCategory: TcxDBLookupComboBox;
+    adsCategories: TAureliusDataset;
+    adsCategoriesSelf: TAureliusEntityField;
+    adsCategoriesID: TIntegerField;
+    adsCategoriesCategoryName: TStringField;
+    adsCategoriesParent: TAureliusEntityField;
+    adsCategoriesBooks: TDataSetField;
+    dsCategories: TDataSource;
+    adsParents: TAureliusDataset;
+    adsParentsSelf: TAureliusEntityField;
+    adsParentsID: TIntegerField;
+    adsParentsCategoryName: TStringField;
+    adsParentsParent: TAureliusEntityField;
+    adsParentsBooks: TDataSetField;
+    dsParents: TDataSource;
     procedure btnOKClick(Sender: TObject);
+    procedure btnCancelClick(Sender: TObject);
   private
-    FController: TEditCategoryController;
-    FCategoryId: Integer;
-  private
-    procedure LoadCategory;
-    function GetCategoryID: Integer;
+    procedure SetCategory(ACategory: TCategory; AManager: TObjectManager);
   public
-    procedure SetCategory(CategoryID: Variant);
-    procedure SetParentCategory(Category: TCategory);
-  public
-    property CategoryId: Integer read GetCategoryID;
+    class function Edit(ACategory: TCategory; AManager: TObjectManager): Boolean;
   end;
 
 var
@@ -46,76 +56,60 @@ uses
 
 { TfrmEditCategory }
 
-procedure TfrmEditCategory.btnOKClick(Sender: TObject);
-var
-  Category: TCategory;
+procedure TfrmEditCategory.btnCancelClick(Sender: TObject);
 begin
-  Category := FController.Category;
-
-  with Category do begin
-    CategoryName := edtCategoryName.Text;
-    if cbbParentCategory.ItemIndex >= 0 then
-      Parent := TCategory(cbbParentCategory.ItemObject);
-  end;
-
-  try
-    FController.SaveCategory(Category);
-    FCategoryId := Category.ID;
-    ModalResult := mrOk;
-  except on E: Exception do begin
-    ShowErrorFmt('Не удалось сохранить категорию "%s"'#10#13+'%s', [edtCategoryName.Text]);
-    ModalResult := mrCancel;
-    end;
-  end;
-end;
-
-procedure TfrmEditCategory.FormCreate(Sender: TObject);
-begin
-  FController := TEditCategoryController.Create(FManager);
-  LoadCategory;
-end;
-
-procedure TfrmEditCategory.FormDestroy(Sender: TObject);
-begin
-  FController.Free;
+  adsCategories.Cancel;
   inherited;
 end;
 
-function TfrmEditCategory.GetCategoryID: Integer;
+procedure TfrmEditCategory.btnOKClick(Sender: TObject);
 begin
-  Result := FCategoryId;
+  with adsCategories do begin
+    try
+      Post;
+    except on E: Exception do begin
+      ShowErrorFmt('Не удалось сохранить категорию "%s"'#10#13+'%s', [edtCategoryName.Text]);
+      ModalResult := mrCancel;
+      end;
+    end;
+  end;
+  inherited;
 end;
 
-procedure TfrmEditCategory.LoadCategory;
+class function TfrmEditCategory.Edit(ACategory: TCategory;
+  AManager: TObjectManager): Boolean;
 var
-  Categories: TList<TCategory>;
-  C: TCategory;
+  Form: TfrmEditCategory;
+  CategoryName: string;
 begin
-  cbbParentCategory.Properties.Items.Clear;
-  Categories := FController.GetCategories;
+  Form := TfrmEditCategory.Create(Application);
   try
-    for C in Categories do
-      cbbParentCategory.Properties.Items.AddObject(C.CategoryName, C);
+    CategoryName := ACategory.CategoryName;
+    if CategoryName.IsEmpty then
+      Form.Header := 'Новая категория книг'
+    else
+      Form.Header := Format('Категория книг: %s', [CategoryName]);
+    Form.SetCategory(ACategory, AManager);
+    Result := Form.ShowModal = mrOk;
   finally
-    Categories.Free;
+    Form.Free;
   end;
 end;
 
-procedure TfrmEditCategory.SetCategory(CategoryID: Variant);
-var
-  Category: TCategory;
+procedure TfrmEditCategory.SetCategory(ACategory: TCategory;
+  AManager: TObjectManager);
 begin
-  FController.Load(CategoryID);
-  Category := FController.Category;
+  // открытие DS
+  adsParents.Close;
+  adsParents.SetSourceCriteria(AManager.Find<TCategory>.OrderBy('CategoryName'));
+  adsParents.Open;
 
-  edtCategoryName.Text := Category.CategoryName;
-  cbbParentCategory.ItemObject := Category.Parent;
-end;
-
-procedure TfrmEditCategory.SetParentCategory(Category: TCategory);
-begin
-  if Assigned(Category) then
-    cbbParentCategory.ItemIndex := cbbParentCategory.Properties.Items.IndexOf( Category.CategoryName );
+  with adsCategories do begin
+    Close;
+    SetSourceObject(ACategory);
+    Open;
+    Edit;
+  end;
 end;
 
 end.

@@ -3,8 +3,9 @@ inherited frmDlgConnection: TfrmDlgConnection
   ClientHeight = 133
   ClientWidth = 487
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   ExplicitWidth = 493
-  ExplicitHeight = 162
+  ExplicitHeight = 161
   PixelsPerInch = 96
   TextHeight = 20
   inherited bvlTop: TBevel
@@ -52,6 +53,7 @@ inherited frmDlgConnection: TfrmDlgConnection
     object cbbConnections: TcxComboBox
       Left = 14
       Top = 12
+      Properties.AutoSelect = False
       TabOrder = 0
       TextHint = #1042#1099#1073#1086#1088' '#1073#1072#1079#1099' '#1076#1072#1085#1085#1099#1093
       Width = 459
@@ -453,5 +455,16 @@ inherited frmDlgConnection: TfrmDlgConnection
           0000000000000000000000000000000000000000000000000000000000000000
           0000}
       end>
+  end
+  object psDefaultParams: TcxPropertiesStore
+    Components = <
+      item
+        Component = cbbConnections
+        Properties.Strings = (
+          'ItemIndex')
+      end>
+    StorageName = 'config'
+    Left = 146
+    Top = 40
   end
 end

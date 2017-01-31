@@ -4,7 +4,7 @@ object Waiting: TWaiting
   BorderStyle = bsNone
   Caption = 'Waiting'
   ClientHeight = 94
-  ClientWidth = 367
+  ClientWidth = 686
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,17 +21,21 @@ object Waiting: TWaiting
     Align = alTop
     Properties.Alignment.Horz = taCenter
     Properties.Alignment.Vert = taVCenter
-    AnchorX = 184
+    Transparent = True
+    ExplicitWidth = 367
+    AnchorX = 343
     AnchorY = 11
   end
   object aiProgress: TdxActivityIndicator
     Left = 0
     Top = 22
-    Width = 367
+    Width = 686
     Height = 50
     Align = alClient
     PropertiesClassName = 'TdxActivityIndicatorHorizontalDotsProperties'
+    Properties.AnimationTime = 500
     Transparent = True
+    ExplicitWidth = 367
   end
   object WaitMessage: TcxLabel
     Left = 0
@@ -39,7 +43,9 @@ object Waiting: TWaiting
     Align = alBottom
     Properties.Alignment.Horz = taCenter
     Properties.Alignment.Vert = taVCenter
-    AnchorX = 184
+    Transparent = True
+    ExplicitWidth = 367
+    AnchorX = 343
     AnchorY = 83
   end
 end

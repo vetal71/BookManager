@@ -6,7 +6,7 @@ inherited frmMain: TfrmMain
   WindowState = wsMaximized
   OnShow = FormShow
   ExplicitWidth = 825
-  ExplicitHeight = 478
+  ExplicitHeight = 477
   PixelsPerInch = 96
   TextHeight = 20
   object sbMain: TdxStatusBar [0]
@@ -34,8 +34,6 @@ inherited frmMain: TfrmMain
     Font.Height = -11
     Font.Name = 'Segoe UI'
     Font.Style = []
-    ExplicitTop = 536
-    ExplicitWidth = 939
   end
   object pgcMain: TcxPageControl [1]
     Left = 0
@@ -48,8 +46,6 @@ inherited frmMain: TfrmMain
     Properties.CloseButtonMode = cbmActiveTab
     Properties.CustomButtons.Buttons = <>
     Properties.Options = [pcoAlwaysShowGoDialogButton, pcoCloseButton, pcoGoDialog, pcoGradient, pcoGradientClientArea, pcoRedrawOnResize]
-    ExplicitWidth = 939
-    ExplicitHeight = 465
     ClientRectBottom = 346
     ClientRectLeft = 2
     ClientRectRight = 807
@@ -57,8 +53,6 @@ inherited frmMain: TfrmMain
     object tsMainView: TcxTabSheet
       Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075
       ImageIndex = 0
-      ExplicitWidth = 935
-      ExplicitHeight = 428
     end
     object tsAudit: TcxTabSheet
       Caption = #1040#1091#1076#1080#1090#1086#1088

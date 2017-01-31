@@ -1,35 +1,32 @@
 program BookManager;
 
 uses
-  Vcl.Forms, Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Controls,
   Common.Utils in 'Common.Utils.pas',
   Model.Entities in 'Model.Entities.pas',
-  Controller.EditBook in 'Controller.EditBook.pas',
-  Common.DBConnection in 'Common.DBConnection.pas',
   Form.MainForm in 'Form.MainForm.pas' {frmMain},
   Form.SQLMonitoring in 'Form.SQLMonitoring.pas' {frmSQLMonitoring},
   Form.BaseForm in 'Form.BaseForm.pas' {frmBase},
-  Controller.Category in 'Controller.Category.pas',
-  Controller.EditCategory in 'Controller.EditCategory.pas',
   Form.BaseEditForm in 'Form.BaseEditForm.pas' {frmBaseEditor},
   Form.EditCategory in 'Form.EditCategory.pas' {frmEditCategory},
   Form.EditBook in 'Form.EditBook.pas' {frmEditBook},
-  Controller.Book in 'Controller.Book.pas',
   Form.MainView in 'Form.MainView.pas' {frmLibraryView},
   Form.AuditLogViewer in 'Form.AuditLogViewer.pas' {frmAuditLogViewer},
   Common.DatabaseUtils in 'Common.DatabaseUtils.pas',
   WaitForm in 'WaitForm.pas' {Waiting},
-  Controller.Base in 'Controller.Base.pas',
-  Form.ConnectionDialog in 'Form.ConnectionDialog.pas' {frmDlgConnection};
+  Form.ConnectionDialog in 'Form.ConnectionDialog.pas' {frmDlgConnection},
+  ConnectionModule in 'ConnectionModule.pas' {db: TDataModule};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  frmDlgConnection := TfrmDlgConnection.Create(Application, nil);
+  frmDlgConnection := TfrmDlgConnection.Create(Application);
   try
     if frmDlgConnection.ShowModal = mrOk then begin
+      Application.CreateForm(Tdb, dm);
       Application.CreateForm(TfrmMain, frmMain);
       frmMain.DBFile := frmDlgConnection.DBFile;
       Application.Run;

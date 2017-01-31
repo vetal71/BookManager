@@ -8,15 +8,16 @@ uses
   cxLookAndFeels, cxLookAndFeelPainters, Vcl.Menus, dxSkinsCore,
   dxSkinMetropolis, System.ImageList, Vcl.ImgList, cxClasses, dxSkinsForm,
   Vcl.StdCtrls, cxButtons, Vcl.ExtCtrls, cxControls, cxContainer, cxEdit,
-  cxTextEdit, cxMaskEdit, cxDropDownEdit;
+  cxTextEdit, cxMaskEdit, cxDropDownEdit, cxPropertiesStore;
 
 type
   TfrmDlgConnection = class(TfrmBaseEditor)
     cbbConnections: TcxComboBox;
+    psDefaultParams: TcxPropertiesStore;
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     function GetDBFile: string;
-    { Private declarations }
   public
     property DBFile: string read GetDBFile;
   end;
@@ -41,6 +42,13 @@ begin
   finally
     ini.Free;
   end;
+  psDefaultParams.RestoreFrom;
+end;
+
+procedure TfrmDlgConnection.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  psDefaultParams.StoreTo();
 end;
 
 function TfrmDlgConnection.GetDBFile: string;

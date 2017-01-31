@@ -4,7 +4,7 @@ interface
 
 uses
   System.Classes, System.SysUtils, Vcl.Forms, Winapi.Windows, Vcl.Controls,
-  System.Generics.Collections;
+  System.Generics.Collections, Winapi.ShellAPI, Winapi.ActiveX;
 
 type
   TFileRecord = record
@@ -23,7 +23,47 @@ function ShowConfirmFmt(AMsg: string; Params: array of const): Boolean;
 procedure ShowInfo(AMsg: string);
 procedure ShowInfoFmt(AMsg: string; Params: array of const);
 
+procedure ShellExecute(const AWnd: HWND; const AOperation, AFileName: String;
+                       const AParameters: String = ''; const ADirectory: String = '';
+                       const AShowCmd: Integer = SW_SHOWNORMAL);
+
 implementation
+
+procedure ShellExecute(const AWnd: HWND; const AOperation, AFileName: String;
+                       const AParameters: String = ''; const ADirectory: String = '';
+                       const AShowCmd: Integer = SW_SHOWNORMAL);
+var
+  ExecInfo: TShellExecuteInfo;
+  NeedUnitialize: Boolean;
+begin
+  Assert(AFileName <> '');
+
+  NeedUnitialize := Succeeded(CoInitializeEx(nil, COINIT_APARTMENTTHREADED or COINIT_DISABLE_OLE1DDE));
+  try
+    FillChar(ExecInfo, SizeOf(ExecInfo), 0);
+    ExecInfo.cbSize := SizeOf(ExecInfo);
+
+    ExecInfo.Wnd := AWnd;
+    ExecInfo.lpVerb := Pointer(AOperation);
+    ExecInfo.lpFile := PChar(AFileName);
+    ExecInfo.lpParameters := Pointer(AParameters);
+    ExecInfo.lpDirectory := Pointer(ADirectory);
+    ExecInfo.nShow := AShowCmd;
+    ExecInfo.fMask := SEE_MASK_NOASYNC { = SEE_MASK_FLAG_DDEWAIT для старых версий Delphi }
+                   or SEE_MASK_FLAG_NO_UI;
+    {$IFDEF UNICODE}
+    // Необязательно, см. http://www.transl-gunsmoker.ru/2015/01/what-does-SEEMASKUNICODE-flag-in-ShellExecuteEx-actually-do.html
+    ExecInfo.fMask := ExecInfo.fMask or SEE_MASK_UNICODE;
+    {$ENDIF}
+
+    {$WARN SYMBOL_PLATFORM OFF}
+    Win32Check(ShellExecuteEx(@ExecInfo));
+    {$WARN SYMBOL_PLATFORM ON}
+  finally
+    if NeedUnitialize then
+      CoUninitialize;
+  end;
+end;
 
 procedure FindAllFiles(FilesList: TFileRecordList; StartDir, FileMask: string);
 var

@@ -19,6 +19,7 @@ type
     bvlTop: TBevel;
     bvlBottom: TBevel;
     procedure btnCancelClick(Sender: TObject);
+    procedure btnOKClick(Sender: TObject);
   private
     FHeader: string;
   protected
@@ -28,8 +29,6 @@ type
     procedure SetHeader(const Value: string);
   public
     property Header : string read GetHeader write SetHeader;
-  public
-    constructor Create(AOwner: TComponent; AManager: TObjectManager); reintroduce;
   end;
 
 var
@@ -46,10 +45,9 @@ begin
   ModalResult := mrCancel;
 end;
 
-constructor TfrmBaseEditor.Create(AOwner: TComponent; AManager: TObjectManager);
+procedure TfrmBaseEditor.btnOKClick(Sender: TObject);
 begin
-  inherited Create(AOwner);
-  FManager := AManager;
+  ModalResult := mrOk;
 end;
 
 function TfrmBaseEditor.GetHeader: string;

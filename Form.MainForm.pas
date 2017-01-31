@@ -22,7 +22,7 @@ uses
   cxCustomData, cxFilter, cxData, cxDBEdit, Vcl.ComCtrls, Vcl.ToolWin, cxTL,
   cxTLdxBarBuiltInMenu, cxInplaceContainer, cxTLData, cxDBTL, cxMaskEdit,
   Vcl.Grids, Vcl.DBGrids, dxBarBuiltInMenu, cxPC,
-  Common.DBConnection;
+  ConnectionModule;
 
 type
   TfrmMain = class(TfrmBase)
@@ -99,9 +99,10 @@ end;
 procedure TfrmMain.SetDBFile(const Value: string);
 begin
   FDBFile := Value;
-  Connection := TDBConnection.CreateConnection(FDBFile);
+  Connection := Tdb.CreateConnection(FDBFile);
   UpdateDatabaseShema(Connection);
   FillData(Connection);
+  sbMain.Panels[2].Text := Format('База данных: %s', [FDBFile]);
 end;
 
 procedure TfrmMain.ShowAuditLogForm;
@@ -119,7 +120,7 @@ procedure TfrmMain.ShowLibraryForm;
 var
   F: TfrmLibraryView;
 begin
-  F := TfrmLibraryView.Create(Application, TObjectManager.Create(TDBConnection.CreateConnection), True);
+  F := TfrmLibraryView.Create(Application, TObjectManager.Create(Connection), True);
   F.Parent := tsMainView;
   F.Align := alClient;
   F.BorderStyle := bsNone;
