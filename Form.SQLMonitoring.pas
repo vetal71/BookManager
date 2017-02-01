@@ -40,9 +40,6 @@ type
 
 implementation
 
-uses
-  Common.DBConnection;
-
 {$R *.dfm}
 
 { TfrmSQLMonitoring }

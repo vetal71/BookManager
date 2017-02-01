@@ -77,8 +77,9 @@ type
     FOwnsManager: Boolean;
     FOnDataChange: TDataChangeEvent;
   private
-    procedure LoadData(SelectedId: Integer = 0);
     function GetBookCount: Integer;
+  public
+    procedure LoadData(SelectedId: Integer = 0);
   public
     constructor Create(AOwner: TComponent; AManager: TObjectManager; AOwnsManager: Boolean); reintroduce;
 

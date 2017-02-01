@@ -61,6 +61,9 @@ type
     Connection: IDBConnection;
   private
     FDBFile: string;
+    FMainView: TForm;
+
+
     procedure ShowSqlMonitorForm;
     procedure ShowAuditLogForm;
     procedure ShowLibraryForm;
@@ -90,7 +93,7 @@ end;
 
 procedure TfrmMain.actRefreshLibraryExecute(Sender: TObject);
 begin
-  ReplicateData(Connection);
+  FillData(Connection);
 end;
 
 procedure TfrmMain.BooksDataChange(Sender: TObject; Field: TField);
@@ -131,6 +134,7 @@ var
   F: TfrmLibraryView;
 begin
   F := TfrmLibraryView.Create(Application, TObjectManager.Create(Connection), True);
+  FMainView := F;
   F.Parent := tsMainView;
   F.Align := alClient;
   F.BorderStyle := bsNone;

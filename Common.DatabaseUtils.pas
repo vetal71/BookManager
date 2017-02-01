@@ -8,14 +8,13 @@ uses
   Aurelius.Engine.DatabaseManager,
   Aurelius.Engine.ObjectManager,
   Aurelius.Criteria.Linq,
-  Model.Entities;
+  Model.Entities, System.Classes;
 
 type
   TCreateMode = (cmCreate, cmReplicate);
 
 procedure UpdateDatabaseShema(Conn: IDBConnection);
 procedure FillData(Conn: IDBConnection);
-procedure ReplicateData(Conn: IDBConnection);
 
 implementation
 
@@ -26,6 +25,9 @@ uses
   Common.Utils,
   WaitForm;
 
+var
+  AutoReplicate: Boolean;
+
 procedure AddRecordsToDatabase(FR: TFileRecordList; AManager: TObjectManager;
   AMode: TCreateMode);
 var
@@ -33,32 +35,45 @@ var
   Book: TBook;
   I: Integer;
 begin
-  Category := AManager.Find<TCategory>(1);
-  if (Category = nil) and (AMode = cmCreate) then begin
-    Category := TCategory.Create;
-    try
-      Category.ID := 1;
-      Category.CategoryName := 'Все книги';
-      AManager.Replicate<TCategory>(Category);
-    finally
-      Category.Free;
-    end;
-
-    for I := 0 to FR.Count - 1 do begin
-      TWaiting.Status(Format('Добавление записи: %s', [ FR[ I ].FileName ]));
-      Book := TBook.Create;
+  if (AMode = cmCreate) then begin
+    Category := AManager.Find<TCategory>(1);
+    if (Category = nil) and (AMode = cmCreate) then begin
+      Category := TCategory.Create;
       try
-        Book.ID   := I + 1;
-        Book.BookName := FR[ I ].FileName;
-        Book.BookLink := FR[ I ].FilePath;
-        Category := AManager.Find<TCategory>(1);
-        Category.Books.Add(AManager.Replicate<TBook>(Book));
+        Category.ID := 1;
+        Category.CategoryName := 'Все книги';
+        AManager.Replicate<TCategory>(Category);
       finally
-        Book.Free;
+        Category.Free;
+      end;
+
+      for I := 0 to FR.Count - 1 do begin
+        TWaiting.Status(Format('Добавление записи: %s', [ FR[ I ].FileName ]));
+        Book := TBook.Create;
+        try
+          Book.ID   := I + 1;
+          Book.BookName := FR[ I ].FileName;
+          Book.BookLink := FR[ I ].FilePath;
+          Category := AManager.Find<TCategory>(1);
+          Category.Books.Add(AManager.Replicate<TBook>(Book));
+        finally
+          Book.Free;
+        end;
+      end;
+      AManager.Flush;
+    end;
+  end else if (AMode = cmReplicate) then begin
+    Category := AManager.Find<TCategory>(1000);
+    if (Category = nil) then begin
+      Category := TCategory.Create;
+      try
+        Category.ID := 1000;
+        Category.CategoryName := 'Новые книги';
+        AManager.Replicate<TCategory>(Category);
+      finally
+        Category.Free;
       end;
     end;
-    AManager.Flush;
-  end else if (AMode = cmReplicate) then begin
     for I := 0 to FR.Count - 1 do begin
       TWaiting.Status(Format('Обработка записи: %s', [ FR[ I ].FileName ]));
       Book := AManager.Find<TBook>
@@ -71,8 +86,8 @@ begin
         try
           Book.BookName := FR[ I ].FileName;
           Book.BookLink := FR[ I ].FilePath;
-          Book.BooksCategory := Category;
-          AManager.Save(Book);
+          Category := AManager.Find<TCategory>(1000);
+          Category.Books.Add(AManager.Replicate<TBook>(Book));
         finally
           Book.Free;
         end;
@@ -122,42 +137,27 @@ procedure FillData(Conn: IDBConnection);
 var
   Manager: TObjectManager;
   Trans: IDBTransaction;
+  UpdateMode: TCreateMode;
 begin
   Manager := TObjectManager.Create(Conn);
-  try
-    if Manager.Find<TBook>.List.Count = 0 then
-    begin
-      Trans := conn.BeginTransaction;
-      try
-        TWaiting.Start('Обновление библиотеки',
-          procedure
-          begin
-            CreateDataFromFiles(Manager, cmCreate);
-          end);
-        Trans.Commit;
-      except
-        Trans.Rollback;
-        raise;
-      end;
-    end;
-  finally
-    Manager.Free;
+  with TMemIniFile.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'conn.ini') do begin
+    AutoReplicate := ReadBool('Config', 'AutoReplicate', False);
   end;
-end;
 
-procedure ReplicateData(Conn: IDBConnection);
-var
-  Manager: TObjectManager;
-  Trans: IDBTransaction;
-begin
-  Manager := TObjectManager.Create(Conn);
   try
     Trans := conn.BeginTransaction;
     try
+      if Manager.Find<TBook>.List.Count = 0 then
+        UpdateMode := cmCreate
+      else
+        UpdateMode := cmReplicate;
+
+      if (UpdateMode = cmReplicate) and not AutoReplicate then Exit;
+
       TWaiting.Start('Обновление библиотеки',
         procedure
         begin
-          CreateDataFromFiles(Manager, cmReplicate);
+          CreateDataFromFiles(Manager, UpdateMode);
         end);
       Trans.Commit;
     except
