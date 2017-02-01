@@ -52,6 +52,8 @@ type
     biSQLMonitor: TdxBarButton;
     bi3: TdxBarButton;
     biSQLAudit: TdxBarButton;
+    bsi1: TdxBarSubItem;
+    bi4: TdxBarButton;
     procedure actExitExecute(Sender: TObject);
     procedure actRefreshLibraryExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -63,6 +65,8 @@ type
     procedure ShowAuditLogForm;
     procedure ShowLibraryForm;
     procedure SetDBFile(const Value: string);
+    procedure BooksDataChange(Sender: TObject; Field: TField);
+
   public
     property DBFile: string read FDBFile write SetDBFile;
   end;
@@ -86,7 +90,13 @@ end;
 
 procedure TfrmMain.actRefreshLibraryExecute(Sender: TObject);
 begin
-  FillData(Connection);
+  ReplicateData(Connection);
+end;
+
+procedure TfrmMain.BooksDataChange(Sender: TObject; Field: TField);
+begin
+  if not Assigned(Sender) then Exit;
+  sbMain.Panels[ 0 ].Text := TDataSource(Sender).DataSet.FieldByName('BookLink').AsString;
 end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
@@ -124,6 +134,7 @@ begin
   F.Parent := tsMainView;
   F.Align := alClient;
   F.BorderStyle := bsNone;
+  F.OnDataChange := BooksDataChange;
   F.Show;
   sbMain.Panels[1].Text := Format('Всего книг в библиотеке: %d штук', [F.BookCount]);
 end;

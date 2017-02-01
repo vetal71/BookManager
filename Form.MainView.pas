@@ -15,8 +15,9 @@ uses
   Aurelius.Bind.Dataset,
   System.Generics.Collections,
   Aurelius.Engine.ObjectManager,
+  Aurelius.Criteria.Linq,
   ConnectionModule,
-  Model.Entities;
+  Model.Entities, cxContainer, cxTextEdit, Vcl.StdCtrls;
 
 type
   TfrmLibraryView = class(TfrmBase)
@@ -66,6 +67,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure grdBooksViewDblClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure dsBooksDataChange(Sender: TObject; Field: TField);
   private
     class var
       FInstance: TfrmLibraryView;
@@ -73,6 +75,7 @@ type
     FManager : TObjectManager;
     FCategories: TList<TCategory>;
     FOwnsManager: Boolean;
+    FOnDataChange: TDataChangeEvent;
   private
     procedure LoadData(SelectedId: Integer = 0);
     function GetBookCount: Integer;
@@ -80,6 +83,7 @@ type
     constructor Create(AOwner: TComponent; AManager: TObjectManager; AOwnsManager: Boolean); reintroduce;
 
     property BookCount: Integer read GetBookCount;
+    property OnDataChange: TDataChangeEvent read FOnDataChange write FOnDataChange;
   end;
 
 var
@@ -104,8 +108,21 @@ resourcestring
 { TfrmLibraryView }
 
 procedure TfrmLibraryView.btnAddBookClick(Sender: TObject);
+var
+  Category: TCategory;
+  Book: TBook;
 begin
-  //
+  Category := adsCategories.Current<TCategory>;
+  Book := TBook.Create('');
+  try
+    if TfrmEditBook.Edit(Book, FManager) then begin
+      FManager.Save(Book);
+    end;
+  finally
+    if not FManager.IsAttached(Book) then
+      Book.Free;
+  end;
+  LoadData(Category.ID);
 end;
 
 procedure TfrmLibraryView.btnAddCategoryClick(Sender: TObject);
@@ -216,6 +233,12 @@ begin
   FOwnsManager := AOwnsManager;
 end;
 
+procedure TfrmLibraryView.dsBooksDataChange(Sender: TObject; Field: TField);
+begin
+  if Assigned(FOnDataChange) then
+    FOnDataChange(Sender, Field);
+end;
+
 procedure TfrmLibraryView.FormDestroy(Sender: TObject);
 begin
   with dm do begin
@@ -253,6 +276,7 @@ end;
 procedure TfrmLibraryView.LoadData(SelectedId: Integer);
 var
   Criteria: TCriteria;
+  Term: string;
 begin
   if (SelectedId = 0) and (adsCategories.Current<TCategory> <> nil) then
     SelectedId := adsCategories.Current<TCategory>.ID;
@@ -262,7 +286,6 @@ begin
 
   Criteria := FManager.Find<TCategory>.OrderBy('ID');
   adsCategories.SetSourceCriteria(Criteria);
-
   adsCategories.Open;
   if SelectedId <> 0 then
     adsCategories.Locate('ID', SelectedId, []);

@@ -88,7 +88,7 @@ begin
     if CategoryName.IsEmpty then
       Form.Header := 'Новая категория книг'
     else
-      Form.Header := Format('Категория книг: %s', [CategoryName]);
+      Form.Header := Format('Редактирование категории книг: %s', [CategoryName]);
     Form.SetCategory(ACategory, AManager);
     Result := Form.ShowModal = mrOk;
   finally

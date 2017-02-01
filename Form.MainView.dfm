@@ -78,6 +78,7 @@ inherited frmLibraryView: TfrmLibraryView
       OptionsSelection.CellSelect = False
       RootValue = -1
       TabOrder = 1
+      OnDblClick = btnEditCategoryClick
       object lstCategoriesCategoryID: TcxDBTreeListColumn
         Caption.AlignHorz = taCenter
         Caption.Text = #1050#1086#1076
@@ -127,7 +128,10 @@ inherited frmLibraryView: TfrmLibraryView
       object grdBooksView: TcxGridDBTableView
         OnDblClick = grdBooksViewDblClick
         Navigator.Buttons.CustomButtons = <>
+        FindPanel.DisplayMode = fpdmAlways
+        FindPanel.FocusViewOnApplyFilter = True
         FindPanel.InfoText = #1042#1074#1077#1076#1080#1090#1077' '#1090#1077#1082#1089#1090' '#1076#1083#1103' '#1087#1086#1080#1089#1082#1072'...'
+        FindPanel.UseExtendedSyntax = True
         DataController.DataSource = dsBooks
         DataController.Summary.DefaultGroupSummaryItems = <>
         DataController.Summary.FooterSummaryItems = <>
@@ -142,7 +146,7 @@ inherited frmLibraryView: TfrmLibraryView
         OptionsData.DeletingConfirmation = False
         OptionsData.Editing = False
         OptionsData.Inserting = False
-        OptionsSelection.CellSelect = False
+        OptionsSelection.InvertSelect = False
         OptionsView.CellEndEllipsis = True
         OptionsView.NoDataToDisplayInfoText = #1053#1077#1090' '#1076#1072#1085#1085#1099#1093' '#1076#1083#1103' '#1086#1090#1086#1073#1088#1072#1078#1077#1085#1080#1103
         OptionsView.CellAutoHeight = True
@@ -326,6 +330,7 @@ inherited frmLibraryView: TfrmLibraryView
   end
   object dsBooks: TDataSource
     DataSet = adsBooks
+    OnDataChange = dsBooksDataChange
     Left = 161
     Top = 144
   end

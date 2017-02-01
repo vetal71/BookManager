@@ -59,7 +59,7 @@ type
     [Association([TAssociationProp.Lazy], CascadeTypeAll - [TCascadeType.Remove])]
     FParent: Proxy<TCategory>;
 
-    [ManyValuedAssociation([TAssociationProp.Lazy], Aurelius.Mapping.Metadata.CascadeTypeAllRemoveOrphan)]
+    [ManyValuedAssociation([TAssociationProp.Lazy], CascadeTypeAllRemoveOrphan)]
     FBooks: Proxy<TList<TBook>>;
     function GetBooks: TList<TBook>;
     function GetParent: TCategory;

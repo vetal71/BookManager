@@ -85,9 +85,15 @@ end;
 class function TfrmEditBook.Edit(ABook: TBook; AManager: TObjectManager): Boolean;
 var
   Form: TfrmEditBook;
+  BookName: string;
 begin
   Form := TfrmEditBook.Create(Application);
   try
+    BookName := ABook.BookName;
+    if BookName.IsEmpty then
+      Form.Header := 'Новая книга'
+    else
+      Form.Header := Format('Редактирование книги: %s', [BookName]);
     Form.SetBook(ABook, AManager);
     Result := Form.ShowModal = mrOk;
   finally

@@ -22,27 +22,27 @@ inherited frmEditBook: TfrmEditBook
     Top = 193
     Width = 915
     ExplicitTop = 193
-    ExplicitWidth = 594
+    ExplicitWidth = 915
     DesignSize = (
       915
       39)
     inherited btnOK: TcxButton
       Left = 664
-      ExplicitLeft = 343
+      ExplicitLeft = 664
     end
     inherited btnCancel: TcxButton
       Left = 789
-      ExplicitLeft = 468
+      ExplicitLeft = 789
     end
   end
   inherited pnlHeader: TPanel
     Width = 915
-    ExplicitWidth = 594
+    ExplicitWidth = 915
   end
   inherited pnlEditor: TPanel
     Width = 915
     Height = 140
-    ExplicitWidth = 594
+    ExplicitWidth = 915
     ExplicitHeight = 140
     DesignSize = (
       915
@@ -102,7 +102,6 @@ inherited frmEditBook: TfrmEditBook
         3B54000000040000000100000000000000000000000000000000}
       PaintStyle = bpsGlyph
       TabOrder = 4
-      ExplicitLeft = 560
     end
     object lblFileLink: TcxLabel
       Left = 16
@@ -153,7 +152,6 @@ inherited frmEditBook: TfrmEditBook
         00031220184F616247CAB88862FA926B4CCB34251A5200000005}
       PaintStyle = bpsGlyph
       TabOrder = 7
-      ExplicitLeft = 560
     end
     object edtBookName: TcxDBTextEdit
       Left = 136
@@ -162,7 +160,6 @@ inherited frmEditBook: TfrmEditBook
       DataBinding.DataField = 'BookName'
       DataBinding.DataSource = dsBooks
       TabOrder = 1
-      ExplicitWidth = 452
       Width = 773
     end
     object edtFileLink: TcxDBTextEdit
@@ -172,7 +169,6 @@ inherited frmEditBook: TfrmEditBook
       DataBinding.DataField = 'BookLink'
       DataBinding.DataSource = dsBooks
       TabOrder = 6
-      ExplicitWidth = 419
       Width = 740
     end
     object cbbParentCategory: TcxComboBox
