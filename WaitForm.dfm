@@ -22,7 +22,6 @@ object Waiting: TWaiting
     Properties.Alignment.Horz = taCenter
     Properties.Alignment.Vert = taVCenter
     Transparent = True
-    ExplicitWidth = 367
     AnchorX = 343
     AnchorY = 11
   end
@@ -35,7 +34,6 @@ object Waiting: TWaiting
     PropertiesClassName = 'TdxActivityIndicatorHorizontalDotsProperties'
     Properties.AnimationTime = 500
     Transparent = True
-    ExplicitWidth = 367
   end
   object WaitMessage: TcxLabel
     Left = 0
@@ -44,7 +42,6 @@ object Waiting: TWaiting
     Properties.Alignment.Horz = taCenter
     Properties.Alignment.Vert = taVCenter
     Transparent = True
-    ExplicitWidth = 367
     AnchorX = 343
     AnchorY = 83
   end

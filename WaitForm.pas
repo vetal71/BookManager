@@ -17,6 +17,7 @@ type
     procedure FormCreate(Sender: TObject);
   strict private
     class var FException: Exception;
+    class var FMode: Boolean;
   private
     class var WaitForm : TWaiting;
     class procedure OnTerminateTask(Sender: TObject);
