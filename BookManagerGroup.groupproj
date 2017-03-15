@@ -9,12 +9,6 @@
         <Projects Include="TestProject.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="D:\Embarcadero\Studio\18.0\Components\TMS Aurelius\Demos\Music Library\MusicLibraryVCL.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="LibraryEntity.dproj">
-            <Dependencies/>
-        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -41,32 +35,14 @@
     <Target Name="TestProject:Make">
         <MSBuild Projects="TestProject.dproj" Targets="Make"/>
     </Target>
-    <Target Name="MusicLibraryVCL">
-        <MSBuild Projects="D:\Embarcadero\Studio\18.0\Components\TMS Aurelius\Demos\Music Library\MusicLibraryVCL.dproj"/>
-    </Target>
-    <Target Name="MusicLibraryVCL:Clean">
-        <MSBuild Projects="D:\Embarcadero\Studio\18.0\Components\TMS Aurelius\Demos\Music Library\MusicLibraryVCL.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="MusicLibraryVCL:Make">
-        <MSBuild Projects="D:\Embarcadero\Studio\18.0\Components\TMS Aurelius\Demos\Music Library\MusicLibraryVCL.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="LibraryEntity">
-        <MSBuild Projects="LibraryEntity.dproj"/>
-    </Target>
-    <Target Name="LibraryEntity:Clean">
-        <MSBuild Projects="LibraryEntity.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="LibraryEntity:Make">
-        <MSBuild Projects="LibraryEntity.dproj" Targets="Make"/>
-    </Target>
     <Target Name="Build">
-        <CallTarget Targets="BookManager;TestProject;MusicLibraryVCL;LibraryEntity"/>
+        <CallTarget Targets="BookManager;TestProject"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="BookManager:Clean;TestProject:Clean;MusicLibraryVCL:Clean;LibraryEntity:Clean"/>
+        <CallTarget Targets="BookManager:Clean;TestProject:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="BookManager:Make;TestProject:Make;MusicLibraryVCL:Make;LibraryEntity:Make"/>
+        <CallTarget Targets="BookManager:Make;TestProject:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

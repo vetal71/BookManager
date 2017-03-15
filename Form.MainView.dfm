@@ -1,11 +1,11 @@
 inherited frmLibraryView: TfrmLibraryView
   Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072
   ClientHeight = 615
-  ClientWidth = 1065
+  ClientWidth = 1135
   OnDestroy = FormDestroy
   OnShow = FormShow
-  ExplicitWidth = 1081
-  ExplicitHeight = 653
+  ExplicitWidth = 1151
+  ExplicitHeight = 654
   PixelsPerInch = 96
   TextHeight = 20
   object pnlLeft: TPanel [0]
@@ -113,19 +113,21 @@ inherited frmLibraryView: TfrmLibraryView
   object pnlRight: TPanel [2]
     Left = 461
     Top = 0
-    Width = 604
+    Width = 674
     Height = 615
     Align = alClient
     BevelOuter = bvLowered
     TabOrder = 2
+    ExplicitWidth = 604
     object grdBooks: TcxGrid
       AlignWithMargins = True
       Left = 4
       Top = 26
-      Width = 596
+      Width = 666
       Height = 585
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 596
       object grdBooksView: TcxGridDBTableView
         OnDblClick = grdBooksViewDblClick
         Navigator.Buttons.CustomButtons = <>
@@ -151,6 +153,7 @@ inherited frmLibraryView: TfrmLibraryView
         OptionsView.CellEndEllipsis = True
         OptionsView.NoDataToDisplayInfoText = #1053#1077#1090' '#1076#1072#1085#1085#1099#1093' '#1076#1083#1103' '#1086#1090#1086#1073#1088#1072#1078#1077#1085#1080#1103
         OptionsView.CellAutoHeight = True
+        OptionsView.ColumnAutoWidth = True
         OptionsView.GroupByBox = False
         OptionsView.HeaderEndEllipsis = True
         OptionsView.Indicator = True
@@ -180,12 +183,13 @@ inherited frmLibraryView: TfrmLibraryView
     object tbBookEdit: TToolBar
       Left = 1
       Top = 1
-      Width = 602
+      Width = 672
       Height = 22
       AutoSize = True
       Caption = #1055#1072#1085#1077#1083#1100' '#1088#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1085#1080#1103' '#1082#1085#1080#1075#1080
       Images = ilEdit
       TabOrder = 1
+      ExplicitWidth = 602
       object btnAddBook: TToolButton
         Left = 0
         Top = 0

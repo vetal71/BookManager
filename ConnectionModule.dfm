@@ -5,7 +5,7 @@ object db: Tdb
   object conn: TUniConnection
     ProviderName = 'SQLite'
     Database = 'd:\DevProjects\BookManager\WorkLibrary.db'
-    Connected = True
+    Options.KeepDesignConnected = False
     LoginPrompt = False
     Left = 32
     Top = 16
