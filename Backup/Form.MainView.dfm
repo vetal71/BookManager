@@ -67,9 +67,9 @@ inherited frmLibraryView: TfrmLibraryView
       Bands = <
         item
         end>
-      DataController.DataSource = db.dsCategories
-      DataController.ParentField = 'PARENT_ID'
-      DataController.KeyField = 'ID'
+      DataController.DataSource = dsCategories
+      DataController.ParentField = 'Parent'
+      DataController.KeyField = 'Self'
       Navigator.Buttons.CustomButtons = <>
       OptionsBehavior.ExpandOnDblClick = False
       OptionsBehavior.IncSearch = True
@@ -118,6 +118,7 @@ inherited frmLibraryView: TfrmLibraryView
     Align = alClient
     BevelOuter = bvLowered
     TabOrder = 2
+    ExplicitWidth = 578
     object grdBooks: TcxGrid
       AlignWithMargins = True
       Left = 4
@@ -126,6 +127,7 @@ inherited frmLibraryView: TfrmLibraryView
       Height = 585
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 570
       object grdBooksView: TcxGridDBTableView
         OnDblClick = grdBooksViewDblClick
         Navigator.Buttons.CustomButtons = <>
@@ -133,7 +135,7 @@ inherited frmLibraryView: TfrmLibraryView
         FindPanel.FocusViewOnApplyFilter = True
         FindPanel.InfoText = #1042#1074#1077#1076#1080#1090#1077' '#1090#1077#1082#1089#1090' '#1076#1083#1103' '#1087#1086#1080#1089#1082#1072'...'
         FindPanel.UseExtendedSyntax = True
-        DataController.DataSource = db.Books
+        DataController.DataSource = dsBooks
         DataController.Summary.DefaultGroupSummaryItems = <>
         DataController.Summary.FooterSummaryItems = <>
         DataController.Summary.SummaryGroups = <>
@@ -186,6 +188,7 @@ inherited frmLibraryView: TfrmLibraryView
       Caption = #1055#1072#1085#1077#1083#1100' '#1088#1077#1076#1072#1082#1090#1080#1088#1086#1074#1072#1085#1080#1103' '#1082#1085#1080#1075#1080
       Images = ilEdit
       TabOrder = 1
+      ExplicitWidth = 576
       object btnAddBook: TToolButton
         Left = 0
         Top = 0
@@ -224,5 +227,115 @@ inherited frmLibraryView: TfrmLibraryView
   end
   inherited ilEdit: TcxImageList
     FormatVersion = 1
+  end
+  object adsCategories: TAureliusDataset
+    FieldDefs = <
+      item
+        Name = 'Self'
+        Attributes = [faReadonly]
+        DataType = ftVariant
+      end
+      item
+        Name = 'ID'
+        Attributes = [faReadonly, faRequired]
+        DataType = ftInteger
+      end
+      item
+        Name = 'CategoryName'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 255
+      end
+      item
+        Name = 'Parent'
+        DataType = ftVariant
+      end
+      item
+        Name = 'Books'
+        Attributes = [faReadonly]
+        DataType = ftDataSet
+      end>
+    IncludeUnmappedObjects = True
+    Left = 80
+    Top = 88
+    DesignClass = 'Model.Entities.TCategory'
+    object adsCategoriesSelf: TAureliusEntityField
+      FieldName = 'Self'
+      ReadOnly = True
+    end
+    object adsCategoriesID: TIntegerField
+      FieldName = 'ID'
+      ReadOnly = True
+      Required = True
+    end
+    object adsCategoriesCategoryName: TStringField
+      FieldName = 'CategoryName'
+      Required = True
+      Size = 255
+    end
+    object adsCategoriesParent: TAureliusEntityField
+      FieldName = 'Parent'
+    end
+    object adsCategoriesBooks: TDataSetField
+      FieldName = 'Books'
+      ReadOnly = True
+    end
+  end
+  object adsBooks: TAureliusDataset
+    FieldDefs = <
+      item
+        Name = 'Self'
+        Attributes = [faReadonly]
+        DataType = ftVariant
+      end
+      item
+        Name = 'ID'
+        Attributes = [faReadonly, faRequired]
+        DataType = ftInteger
+      end
+      item
+        Name = 'BookName'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 255
+      end
+      item
+        Name = 'BookLink'
+        DataType = ftString
+        Size = 255
+      end>
+    IncludeUnmappedObjects = False
+    Left = 160
+    Top = 88
+    DesignClass = 'Model.Entities.TBook'
+    object adsBooksSelf: TAureliusEntityField
+      FieldName = 'Self'
+      ReadOnly = True
+    end
+    object adsBooksID: TIntegerField
+      FieldName = 'ID'
+      ReadOnly = True
+      Required = True
+    end
+    object adsBooksBookName: TStringField
+      FieldName = 'BookName'
+      Required = True
+      Size = 255
+    end
+    object adsBooksBookLink: TStringField
+      FieldName = 'BookLink'
+      Size = 255
+    end
+  end
+  object dsCategories: TDataSource
+    DataSet = adsCategories
+    Left = 81
+    Top = 145
+  end
+  object dsBooks: TDataSource
+    DataSet = adsBooks
+    OnDataChange = dsBooksDataChange
+    Left = 161
+    Top = 144
   end
 end

@@ -3,7 +3,6 @@ inherited frmSQLMonitoring: TfrmSQLMonitoring
   Caption = 'SQL '#1084#1086#1085#1080#1090#1086#1088#1080#1085#1075
   ClientHeight = 535
   ClientWidth = 717
-  OnCreate = FormCreate
   ExplicitWidth = 723
   ExplicitHeight = 563
   PixelsPerInch = 96

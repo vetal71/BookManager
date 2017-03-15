@@ -33,6 +33,6 @@ requires
   dbrtl;
 
 contains
-  Model.Entities in 'Model.Entities.pas';
+  Model.Entity.Book in 'Model.Entity.Book.pas';
 
 end.

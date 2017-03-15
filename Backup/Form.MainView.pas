@@ -12,9 +12,12 @@ uses
   cxGridLevel, cxGridCustomTableView, cxGridTableView, cxGridDBTableView,
   cxGridCustomView, cxGrid, cxSplitter, cxInplaceContainer, cxDBTL, cxTLData,
   Vcl.ComCtrls, Vcl.ToolWin, Vcl.ExtCtrls, dxActivityIndicator,
+  Aurelius.Bind.Dataset,
   System.Generics.Collections,
+  Aurelius.Engine.ObjectManager,
+  Aurelius.Criteria.Linq,
   ConnectionModule,
-  cxContainer, cxTextEdit, Vcl.StdCtrls;
+  Model.Entities, cxContainer, cxTextEdit, Vcl.StdCtrls;
 
 type
   TfrmLibraryView = class(TfrmBase)
@@ -40,6 +43,19 @@ type
     btnEditBook: TToolButton;
     btnDelBook: TToolButton;
     btnRefreshBook: TToolButton;
+    adsCategories: TAureliusDataset;
+    adsCategoriesSelf: TAureliusEntityField;
+    adsCategoriesID: TIntegerField;
+    adsCategoriesCategoryName: TStringField;
+    adsCategoriesParent: TAureliusEntityField;
+    adsCategoriesBooks: TDataSetField;
+    adsBooks: TAureliusDataset;
+    adsBooksSelf: TAureliusEntityField;
+    adsBooksID: TIntegerField;
+    adsBooksBookName: TStringField;
+    adsBooksBookLink: TStringField;
+    dsCategories: TDataSource;
+    dsBooks: TDataSource;
     procedure btnAddCategoryClick(Sender: TObject);
     procedure btnEditCategoryClick(Sender: TObject);
     procedure btnDelCategoryClick(Sender: TObject);
@@ -51,17 +67,24 @@ type
     procedure FormShow(Sender: TObject);
     procedure grdBooksViewDblClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-//    procedure dsBooksDataChange(Sender: TObject; Field: TField);
+    procedure dsBooksDataChange(Sender: TObject; Field: TField);
   private
     class var
       FInstance: TfrmLibraryView;
+  private
+    FManager : TObjectManager;
+    FCategories: TList<TCategory>;
+    FOwnsManager: Boolean;
+    FOnDataChange: TDataChangeEvent;
   private
     function GetBookCount: Integer;
   public
     procedure LoadData(SelectedId: Integer = 0);
   public
+    constructor Create(AOwner: TComponent; AManager: TObjectManager; AOwnsManager: Boolean); reintroduce;
+
     property BookCount: Integer read GetBookCount;
-    //property OnDataChange: TDataChangeEvent read FOnDataChange write FOnDataChange;
+    property OnDataChange: TDataChangeEvent read FOnDataChange write FOnDataChange;
   end;
 
 var
@@ -70,9 +93,10 @@ var
 implementation
 
 uses
+  Aurelius.Criteria.Base,
   Common.Utils,
-//  Form.EditCategory,
-//  Form.EditBook,
+  Form.EditCategory,
+  Form.EditBook,
   System.IniFiles,
   Vcl.FileCtrl;
 
@@ -85,50 +109,54 @@ resourcestring
 { TfrmLibraryView }
 
 procedure TfrmLibraryView.btnAddBookClick(Sender: TObject);
+var
+  Category: TCategory;
+  Book: TBook;
 begin
-//  Category := adsCategories.Current<TCategory>;
-//  Book := TBook.Create('');
-//  try
-//    if TfrmEditBook.Edit(Book, FManager) then begin
-//      FManager.Save(Book);
-//    end;
-//  finally
-//    if not FManager.IsAttached(Book) then
-//      Book.Free;
-//  end;
-//  LoadData(Category.ID);
+  Category := adsCategories.Current<TCategory>;
+  Book := TBook.Create('');
+  try
+    if TfrmEditBook.Edit(Book, FManager) then begin
+      FManager.Save(Book);
+    end;
+  finally
+    if not FManager.IsAttached(Book) then
+      Book.Free;
+  end;
+  LoadData(Category.ID);
 end;
 
 procedure TfrmLibraryView.btnAddCategoryClick(Sender: TObject);
-//var
-//  Category: TCategory;
-//  Book: TBook;
+var
+  Category: TCategory;
+  Book: TBook;
 begin
-//  Category := TCategory.Create;
-//  try
-//    Category.Parent := adsCategories.Current<TCategory>;
-//    if TfrmEditCategory.Edit(Category, FManager) then begin
-//      FManager.Save(Category);
-//    end;
-//  finally
-//    for Book in Category.Books do
-//      if not FManager.IsAttached(Book) then
-//        Book.Free;
-//
-//    if not FManager.IsAttached(Category) then
-//      Category.Free;
-//  end;
-//  LoadData(Category.ID);
+  Category := TCategory.Create;
+  try
+    Category.Parent := adsCategories.Current<TCategory>;
+    if TfrmEditCategory.Edit(Category, FManager) then begin
+      FManager.Save(Category);
+    end;
+  finally
+    for Book in Category.Books do
+      if not FManager.IsAttached(Book) then
+        Book.Free;
+
+    if not FManager.IsAttached(Category) then
+      Category.Free;
+  end;
+  LoadData(Category.ID);
 end;
 
 procedure TfrmLibraryView.btnDelBookClick(Sender: TObject);
 var
   BookName: string;
 begin
-  BookName := DM.qryBooks.FieldByName('BookName').asString;
+  BookName := adsBooks.Current<TBook>.BookName;
   if ShowConfirmFmt(rsConfirmDeleteRecord, ['книгу', BookName]) then begin
     try
-      DM.qryBooks.Delete;
+      adsBooks.Delete;
+      LoadData(adsCategories.Current<TCategory>.ID);
     except
       ShowErrorFmt(rsErrorDeleteRecord, [BookName]);
     end;
@@ -139,11 +167,11 @@ procedure TfrmLibraryView.btnDelCategoryClick(Sender: TObject);
 var
   CategoryName: string;
 begin
-  CategoryName := DM.qryCategories.FieldByName('CategoryName').asString;
+  CategoryName := adsCategories.Current<TCategory>.CategoryName;
   if ShowConfirmFmt(rsConfirmDeleteRecord, ['категорию', CategoryName]) then
   begin
     try
-      DM.qryCategories.Delete;
+      LoadData(adsCategories.Current<TCategory>.ID);
     except
       ShowErrorFmt(rsErrorDeleteRecord, [CategoryName]);
     end;
@@ -151,59 +179,75 @@ begin
 end;
 
 procedure TfrmLibraryView.btnEditBookClick(Sender: TObject);
-//var
-//  Book: TBook;
-//  Edit: Boolean;
+var
+  Book: TBook;
+  Edit: Boolean;
 begin
-//  Book := adsBooks.Current<TBook>;
-//  if Book = nil then Exit;
-//  try
-//    Edit := TfrmEditBook.Edit(Book, FManager);
-//    if Edit then begin
-//      FManager.Flush(Book);
-//    end;
-//  finally
-//    if not FManager.IsAttached(Book) then
-//      Book.Free;
-//  end;
-//  if Edit then LoadData(Book.BooksCategory.ID);
+  Book := adsBooks.Current<TBook>;
+  if Book = nil then Exit;
+  try
+    Edit := TfrmEditBook.Edit(Book, FManager);
+    if Edit then begin
+      FManager.Flush(Book);
+    end;
+  finally
+    if not FManager.IsAttached(Book) then
+      Book.Free;
+  end;
+  if Edit then LoadData(Book.BooksCategory.ID);
 end;
 
 procedure TfrmLibraryView.btnEditCategoryClick(Sender: TObject);
-//var
-//  Category: TCategory;
-//  Book: TBook;
-//  Edit: Boolean;
+var
+  Category: TCategory;
+  Book: TBook;
+  Edit: Boolean;
 begin
-//  Category := adsCategories.Current<TCategory>;
-//  if Category = nil then Exit;
-//  Edit := TfrmEditCategory.Edit(Category, FManager);
-//  if Edit then begin
-//    FManager.Flush(Category);
-//  end else begin
-//    for Book in Category.Books do
-//      if not FManager.IsAttached(Book) then
-//        Book.Free;
-//  end;
-//  if Edit then LoadData(Category.ID);
+  Category := adsCategories.Current<TCategory>;
+  if Category = nil then Exit;
+  Edit := TfrmEditCategory.Edit(Category, FManager);
+  if Edit then begin
+    FManager.Flush(Category);
+  end else begin
+    for Book in Category.Books do
+      if not FManager.IsAttached(Book) then
+        Book.Free;
+  end;
+  if Edit then LoadData(Category.ID);
 end;
 
 procedure TfrmLibraryView.btnRefreshBookClick(Sender: TObject);
 begin
-  //LoadData(adsCategories.Current<TCategory>.ID);
+  LoadData(adsCategories.Current<TCategory>.ID);
 end;
 
 procedure TfrmLibraryView.btnRefreshClick(Sender: TObject);
 begin
-  //LoadData(adsCategories.Current<TCategory>.ID);
+  LoadData(adsCategories.Current<TCategory>.ID);
+end;
+
+constructor TfrmLibraryView.Create(AOwner: TComponent; AManager: TObjectManager;
+  AOwnsManager: Boolean);
+begin
+  inherited Create(AOwner);
+  FManager     := AManager;
+  FOwnsManager := AOwnsManager;
+end;
+
+procedure TfrmLibraryView.dsBooksDataChange(Sender: TObject; Field: TField);
+begin
+  if Assigned(FOnDataChange) then
+    FOnDataChange(Sender, Field);
 end;
 
 procedure TfrmLibraryView.FormDestroy(Sender: TObject);
 begin
   with dm do begin
-    qryCategories.Close;
-    qryBooks.Close;
+    adsCategories.Close;
+    adsBooks.Close;
   end;
+  if FOwnsManager then
+    FManager.Free;
 end;
 
 procedure TfrmLibraryView.FormShow(Sender: TObject);
@@ -214,7 +258,7 @@ end;
 
 function TfrmLibraryView.GetBookCount: Integer;
 begin
-  Result := DM.qryBooks.RecordCount;
+  Result := FManager.Find<TBook>.List.Count;
 end;
 
 procedure TfrmLibraryView.grdBooksViewDblClick(Sender: TObject);
@@ -223,36 +267,31 @@ var
 begin
   // вызов программы-читалки
   with dm do begin
-    FileName := qryBooks.FieldByName('BookLink').AsString;
-    if FileName.IsEmpty then Exit;
+    if adsBooks.Current<TBook> = nil then Exit;
+    FileName := adsBooks.Current<TBook>.BookLink;
   end;
 
   ShellExecute(0, '', FileName);
 end;
 
 procedure TfrmLibraryView.LoadData(SelectedId: Integer);
-//var
-//  Criteria: TCriteria;
-//  Term: string;
+var
+  Criteria: TCriteria;
+  Term: string;
 begin
-//  if (SelectedId = 0) and (adsCategories.Current<TCategory> <> nil) then
-//    SelectedId := adsCategories.Current<TCategory>.ID;
-//  adsCategories.Close;
-//  adsBooks.Close;
-//  FManager.Clear;
-//
-//  Criteria := FManager.Find<TCategory>.OrderBy('ID');
-//  adsCategories.SetSourceCriteria(Criteria);
-//  adsCategories.Open;
-//  if SelectedId <> 0 then
-//    adsCategories.Locate('ID', SelectedId, []);
-//  adsBooks.DatasetField := (adsCategories.FieldByName('Books') as TDataSetField);
-//  adsBooks.Open;
+  if (SelectedId = 0) and (adsCategories.Current<TCategory> <> nil) then
+    SelectedId := adsCategories.Current<TCategory>.ID;
+  adsCategories.Close;
+  adsBooks.Close;
+  FManager.Clear;
 
-  with DM do begin
-    qryCategories.Open;
-    qryBooks.Open;
-  end;
+  Criteria := FManager.Find<TCategory>.OrderBy('ID');
+  adsCategories.SetSourceCriteria(Criteria);
+  adsCategories.Open;
+  if SelectedId <> 0 then
+    adsCategories.Locate('ID', SelectedId, []);
+  adsBooks.DatasetField := (adsCategories.FieldByName('Books') as TDataSetField);
+  adsBooks.Open;
 
   lstCategories.FullExpand;
 end;

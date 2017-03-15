@@ -3,19 +3,31 @@ unit ConnectionModule;
 interface
 
 uses
-  Aurelius.Drivers.Interfaces,
-  Aurelius.SQL.SQLite,
-  Aurelius.Schema.SQLite,   	     		 	   	     	 	   	    		  	 
-  Aurelius.Drivers.SQLite,
-  System.SysUtils, System.Classes, Data.DB, Aurelius.Bind.Dataset;
+  System.SysUtils, System.Classes, Data.DB, DBAccess, Uni, DASQLMonitor,
+  UniSQLMonitor, UniProvider, SQLiteUniProvider, Common.Utils, MemDS;
 
 type   	     		 	   	     	 	   	    		  	 
   Tdb = class(TDataModule)
+    conn: TUniConnection;
+    SQLiteProvider: TSQLiteUniProvider;
+    SQLMonitor: TUniSQLMonitor;
+    Books: TUniDataSource;
+    qryBooks: TUniQuery;
+    dsCategories: TUniDataSource;
+    qryCategories: TUniQuery;
+    procedure SQLMonitorSQL(Sender: TObject; Text: string; Flag: TDATraceFlag);
   private
-    class var FDBFile: string;
+    FDBFile: string;
+    FOnSQL: TOnSQLEvent;
+    FActiveMonitoring: Boolean;
+
+  private
+    procedure SetDBFile(Value: string);
+    procedure SetActiveMonitoring(Value: Boolean);
   public
-    class function CreateConnection(DBFile: string = ''): IDBConnection;
-    class function CreateFactory: IDBConnectionFactory;
+    property DBFile: string          read FDBFile write SetDBFile;
+    property OnSQLEvent: TOnSQLEvent read FOnSQL  write FOnSQL;
+    property ActiveMonitoring: Boolean read FActiveMonitoring write SetActiveMonitoring;
   end;
 
 var
@@ -23,30 +35,30 @@ var
 
 implementation
 
-{%CLASSGROUP 'Vcl.Controls.TControl'}
-
-uses 
-  Aurelius.Drivers.Base;
-
 {$R *.dfm}
-   	     		 	   	     	 	   	    		  	 
+
 { Tdb }
 
-class function Tdb.CreateConnection(DBFile: string = ''): IDBConnection;
+procedure Tdb.SetDBFile(Value: string);
 begin
-  FDBFile := DBFile;
-  Result := TSQLiteNativeConnectionAdapter.Create(FDBFile);
-  (Result as TSQLiteNativeConnectionAdapter).EnableForeignKeys;
+  FDBFile := Value;
+  conn.Database := FDBFile;
+  try
+    conn.Connect;
+  except on E: Exception do
+    ShowErrorFmt('Ошибка подключения к базе данных %s'#13'%s', [E.Message]);
+  end;
 end;
 
-class function Tdb.CreateFactory: IDBConnectionFactory;
+procedure Tdb.SetActiveMonitoring(Value: Boolean);
 begin
-  Result := TDBConnectionFactory.Create(
-    function: IDBConnection
-    begin
-      Result := CreateConnection(FDBFile);
-    end
-  );
+  SQLMonitor.Active := Value;
+end;
+
+procedure Tdb.SQLMonitorSQL(Sender: TObject; Text: string; Flag: TDATraceFlag);
+begin
+  if Assigned(FOnSQL) then
+    FOnSQL(Sender, Text, Flag);
 end;
 
 end.

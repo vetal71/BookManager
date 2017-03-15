@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Form.BaseForm, dxSkinsCore,
   dxSkinMetropolis, cxGraphics, cxLookAndFeels, cxLookAndFeelPainters,
   Vcl.Menus, Vcl.StdCtrls, cxButtons, Vcl.ExtCtrls, cxClasses, dxSkinsForm,
-  System.ImageList, Vcl.ImgList;
+  System.ImageList, Vcl.ImgList, Aurelius.Engine.ObjectManager;
 
 type
   TfrmBaseEditor = class(TfrmBase)
@@ -22,6 +22,8 @@ type
     procedure btnOKClick(Sender: TObject);
   private
     FHeader: string;
+  protected
+    FManager: TObjectManager;
   private
     function GetHeader: string;
     procedure SetHeader(const Value: string);

@@ -16,11 +16,13 @@ type
   TBook = class;
   TCategory = class;
 
-  [Entity, Automapping]
+  [Entity]
   [Table('BOOKS')]
+  [Id('FBookID', TIdGenerator.IdentityOrSequence)]
   TBook = class
-  strict private
-    FID: Integer;
+  private
+    [Column('BOOKID', [TColumnProp.Required, TColumnProp.NoInsert, TColumnProp.NoUpdate])]
+    FBookID: Integer;
 
     [Column('BOOKNAME', [TColumnProp.Required])]
     [DBTypeMemo]
@@ -31,46 +33,51 @@ type
     FBookLink: Nullable<String>;
 
     [Association([TAssociationProp.Lazy], CascadeTypeAll - [TCascadeType.Remove])]
-    [JoinColumn('BOOKS_CATEGORY_ID', [], 'ID')]
-    FBooksCategory: Proxy<TCategory>;
-    function GetBooksCategory: TCategory;
-    procedure SetBooksCategory(const Value: TCategory);
+    [JoinColumn('CATEGORYID', [], 'CATEGORYID')]
+    FCategory: Proxy<TCategory>;
 
+  private
+    function GetCategoryID: TCategory;
+    procedure SetCategoryID(const Value: TCategory);
   public
-    property ID: Integer read FID write FID;
+    property BookID: Integer read FBookID write FBookID;
     property BookName: String read FBookName write FBookName;
     property BookLink: Nullable<String> read FBookLink write FBookLink;
-    property BooksCategory: TCategory read GetBooksCategory write SetBooksCategory;
+    property Category: TCategory read GetCategoryID write SetCategoryID;
   public
     constructor Create(ABookName: string); overload;
     constructor Create(ABookName: string; ABookLink: Nullable<string>); overload;
   end;
 
-  [Entity, Automapping]
+  [Entity]
   [Table('CATEGORIES')]
+  [Id('FCategoryID', TIdGenerator.IdentityOrSequence)]
   TCategory = class
-  strict private
-    FID: Integer;
+  private
+    [Column('CATEGORYID', [TColumnProp.Required, TColumnProp.NoInsert, TColumnProp.NoUpdate])]
+    FCategoryID: Integer;
 
     [Column('CATEGORYNAME', [TColumnProp.Required])]
     [DBTypeMemo]
     FCategoryName: String;
 
     [Association([TAssociationProp.Lazy], CascadeTypeAll - [TCascadeType.Remove])]
+    [JoinColumn('PARENTID', [], 'CATEGORYID')]
     FParent: Proxy<TCategory>;
 
-    [ManyValuedAssociation([TAssociationProp.Lazy], CascadeTypeAllRemoveOrphan)]
+    [ManyValuedAssociation([TAssociationProp.Lazy], [TCascadeType.SaveUpdate, TCascadeType.Merge], 'FCategory')]
     FBooks: Proxy<TList<TBook>>;
+
+  private
+    function GetParentID: TCategory;
+    procedure SetParentID(const Value: TCategory);
     function GetBooks: TList<TBook>;
-    function GetParent: TCategory;
-    procedure SetParent(const Value: TCategory);
   public
-    constructor Create; overload;
-    constructor Create(AName: string); overload;
+    constructor Create;
     destructor Destroy; override;
-    property ID: Integer read FID write FID;
+    property CategoryID: Integer read FCategoryID write FCategoryID;
     property CategoryName: String read FCategoryName write FCategoryName;
-    property Parent: TCategory read GetParent write SetParent;
+    property Parent: TCategory read GetParentID write SetParentID;
     property Books: TList<TBook> read GetBooks;
   end;
 
@@ -79,35 +86,24 @@ implementation
 
 { TBook}
 
-constructor TBook.Create(ABookName: string);
+function TBook.GetCategoryID: TCategory;
 begin
-  FBookName := ABookName;
+  result := FCategory.Value;
 end;
 
-constructor TBook.Create(ABookName: string; ABookLink: Nullable<string>);
+procedure TBook.SetCategoryID(const Value: TCategory);
 begin
-  Create(ABookName);
-  FBookLink := ABookLink;
-end;
-
-function TBook.GetBooksCategory: TCategory;
-begin
-  Result := FBooksCategory.Value;
-end;
-
-procedure TBook.SetBooksCategory(const Value: TCategory);
-begin
-  FBooksCategory.Value := Value;
+  FCategory.Value := Value;
 end;
 
 { TCategory}
 
-function TCategory.GetParent: TCategory;
+function TCategory.GetParentID: TCategory;
 begin
-  Result := FParent.Value;
+  result := FParent.Value;
 end;
 
-procedure TCategory.SetParent(const Value: TCategory);
+procedure TCategory.SetParentID(const Value: TCategory);
 begin
   FParent.Value := Value;
 end;
@@ -118,12 +114,6 @@ begin
   FBooks.SetInitialValue(TList<TBook>.Create);
 end;
 
-constructor TCategory.Create(AName: string);
-begin
-  Create;
-  FCategoryName := AName;
-end;
-
 destructor TCategory.Destroy;
 begin
   FBooks.DestroyValue;
@@ -132,7 +122,7 @@ end;
 
 function TCategory.GetBooks: TList<TBook>;
 begin
-  Result := FBooks.Value;
+  result := FBooks.Value;
 end;
 
 end.

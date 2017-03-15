@@ -96,7 +96,6 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="Common.Utils.pas"/>
-        <DCCReference Include="Model.Entities.pas"/>
         <DCCReference Include="Form.MainForm.pas">
             <Form>frmMain</Form>
         </DCCReference>
@@ -109,17 +108,8 @@
         <DCCReference Include="Form.BaseEditForm.pas">
             <Form>frmBaseEditor</Form>
         </DCCReference>
-        <DCCReference Include="Form.EditCategory.pas">
-            <Form>frmEditCategory</Form>
-        </DCCReference>
-        <DCCReference Include="Form.EditBook.pas">
-            <Form>frmEditBook</Form>
-        </DCCReference>
         <DCCReference Include="Form.MainView.pas">
             <Form>frmLibraryView</Form>
-        </DCCReference>
-        <DCCReference Include="Form.AuditLogViewer.pas">
-            <Form>frmAuditLogViewer</Form>
         </DCCReference>
         <DCCReference Include="Common.DatabaseUtils.pas"/>
         <DCCReference Include="WaitForm.pas">
@@ -129,7 +119,7 @@
             <Form>frmDlgConnection</Form>
         </DCCReference>
         <DCCReference Include="ConnectionModule.pas">
-            <Form>db</Form>
+            <Form>DM</Form>
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
@@ -167,12 +157,27 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployClass Name="ProjectiOSDeviceResourceRules">
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectOSXResource">
@@ -551,27 +556,12 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="DependencyModule">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                        <Extensions>.dll;.bpl</Extensions>
-                    </Platform>
+                <DeployClass Name="ProjectiOSDeviceResourceRules">
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>

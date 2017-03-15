@@ -4,21 +4,25 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, dxSkinsCore, cxGraphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, dxSkinsCore, dxBevel, cxGraphics,
   Form.BaseForm,
   cxControls, cxLookAndFeels, cxLookAndFeelPainters, dxSkinMetropolis,
   dxSkinsdxStatusBarPainter, dxSkinsdxBarPainter, dxSkinsForm, System.ImageList,
+  System.Generics.Collections,
+  Aurelius.Drivers.Interfaces,
   Vcl.ImgList, dxBar, cxClasses, dxStatusBar,
+  Aurelius.Engine.DatabaseManager,
+  Aurelius.Engine.ObjectManager,
   Vcl.Menus, System.Actions,
   Vcl.ActnList, cxSplitter, Vcl.ExtCtrls,
   Form.SQLMonitoring, cxStyles, dxSkinscxPCPainter,
   cxDataStorage, cxEdit, cxNavigator, Data.DB, cxDBData, cxContainer, cxListBox,
-  cxGridCustomView, cxGridCustomTableView,
+  cxDBNavigator, cxGridLevel, cxGridCustomView, cxGridCustomTableView,
   cxGridTableView, cxGridDBTableView, cxGrid,
-  Vcl.ComCtrls, cxTL,
-  cxTLdxBarBuiltInMenu, cxInplaceContainer, cxMaskEdit,
-  dxBarBuiltInMenu, cxPC,
-  ConnectionModule, Uni;
+  cxCustomData, cxFilter, cxData, cxDBEdit, Vcl.ComCtrls, Vcl.ToolWin, cxTL,
+  cxTLdxBarBuiltInMenu, cxInplaceContainer, cxTLData, cxDBTL, cxMaskEdit,
+  Vcl.Grids, Vcl.DBGrids, dxBarBuiltInMenu, cxPC,
+  ConnectionModule;
 
 type
   TfrmMain = class(TfrmBase)
@@ -40,6 +44,7 @@ type
     btnSQLMonitor: TdxBarLargeButton;
     pgcMain: TcxPageControl;
     tsMainView: TcxTabSheet;
+    tsAudit: TcxTabSheet;
     tsSQLMonitor: TcxTabSheet;
     bi1: TdxBarButton;
     bsiService: TdxBarSubItem;
@@ -53,13 +58,20 @@ type
     procedure actRefreshLibraryExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
-    Connection: TUniConnection;
+    Connection: IDBConnection;
   private
+    FDBFile: string;
     FMainView: TForm;
 
+
     procedure ShowSqlMonitorForm;
+    procedure ShowAuditLogForm;
     procedure ShowLibraryForm;
+    procedure SetDBFile(const Value: string);
     procedure BooksDataChange(Sender: TObject; Field: TField);
+
+  public
+    property DBFile: string read FDBFile write SetDBFile;
   end;
 
 var
@@ -68,7 +80,8 @@ var
 implementation
 
 uses
-
+  Common.DatabaseUtils,
+  Form.AuditLogViewer,
   Form.MainView;
 
 {$R *.dfm}
@@ -80,7 +93,7 @@ end;
 
 procedure TfrmMain.actRefreshLibraryExecute(Sender: TObject);
 begin
-  //FillData(Connection);
+  FillData(Connection);
 end;
 
 procedure TfrmMain.BooksDataChange(Sender: TObject; Field: TField);
@@ -91,22 +104,41 @@ end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
-  sbMain.Panels[2].Text := Format('База данных: %s', [DM.DBFile]);
-
   ShowSqlMonitorForm;
+  ShowAuditLogForm;
   ShowLibraryForm;
+end;
+
+procedure TfrmMain.SetDBFile(const Value: string);
+begin
+  FDBFile := Value;
+  Connection := Tdb.CreateConnection(FDBFile);
+  UpdateDatabaseShema(Connection);
+  FillData(Connection);
+  sbMain.Panels[2].Text := Format('База данных: %s', [FDBFile]);
+end;
+
+procedure TfrmMain.ShowAuditLogForm;
+var
+  F: TfrmAuditLogViewer;
+begin
+  F := TfrmAuditLogViewer.GetInstance;
+  F.Parent := tsAudit;
+  F.Align := alClient;
+  F.BorderStyle := bsNone;
+  F.Show;
 end;
 
 procedure TfrmMain.ShowLibraryForm;
 var
   F: TfrmLibraryView;
 begin
-  F := TfrmLibraryView.Create(Application);
+  F := TfrmLibraryView.Create(Application, TObjectManager.Create(Connection), True);
   FMainView := F;
   F.Parent := tsMainView;
   F.Align := alClient;
   F.BorderStyle := bsNone;
-  //F.OnDataChange := BooksDataChange;
+  F.OnDataChange := BooksDataChange;
   F.Show;
   sbMain.Panels[1].Text := Format('Всего книг в библиотеке: %d штук', [F.BookCount]);
 end;
@@ -115,7 +147,7 @@ procedure TfrmMain.ShowSqlMonitorForm;
 var
   F: TfrmSQLMonitoring;
 begin
-  F := TfrmSQLMonitoring.Create(Application);
+  F := TfrmSQLMonitoring.GetInstance;
   F.Parent := tsSQLMonitor;
   F.Align := alClient;
   F.BorderStyle := bsNone;
