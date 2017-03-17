@@ -7,7 +7,7 @@ uses
   UniSQLMonitor, UniProvider, SQLiteUniProvider, Common.Utils, MemDS;
 
 type   	     		 	   	     	 	   	    		  	 
-  Tdb = class(TDataModule)
+  TDM = class(TDataModule)
     conn: TUniConnection;
     SQLiteProvider: TSQLiteUniProvider;
     SQLMonitor: TUniSQLMonitor;
@@ -16,11 +16,14 @@ type
     dsCategories: TUniDataSource;
     qryCategories: TUniQuery;
     procedure SQLMonitorSQL(Sender: TObject; Text: string; Flag: TDATraceFlag);
+    procedure BooksDataChange(Sender: TObject; Field: TField);
+    procedure DataModuleDestroy(Sender: TObject);
   private
     FDBFile: string;
     FOnSQL: TOnSQLEvent;
     FActiveMonitoring: Boolean;
-
+    FApplicationError: Boolean;
+    FOnDataChange: TDataChangeEvent;
   private
     procedure SetDBFile(Value: string);
     procedure SetActiveMonitoring(Value: Boolean);
@@ -28,34 +31,56 @@ type
     property DBFile: string          read FDBFile write SetDBFile;
     property OnSQLEvent: TOnSQLEvent read FOnSQL  write FOnSQL;
     property ActiveMonitoring: Boolean read FActiveMonitoring write SetActiveMonitoring;
+    property ApplicationError: Boolean read FApplicationError default False;
+    property OnDataChange: TDataChangeEvent read FOnDataChange write FOnDataChange;
   end;
 
 var
-  DM: Tdb;
+  DM: TDM;
 
 implementation
+
+uses
+  Common.DatabaseUtils;
 
 {$R *.dfm}
 
 { Tdb }
 
-procedure Tdb.SetDBFile(Value: string);
+procedure TDM.SetDBFile(Value: string);
 begin
   FDBFile := Value;
+  // нет такой базы - создадим
+  if not UpdateDatabaseShema(FDBFile) then begin
+    ShowError('Неисправимая ошибка. Приложение будет закрыто.');
+    FApplicationError := True;
+  end;
   conn.Database := FDBFile;
   try
     conn.Connect;
+    FillData;
   except on E: Exception do
     ShowErrorFmt('Ошибка подключения к базе данных %s'#13'%s', [E.Message]);
   end;
 end;
 
-procedure Tdb.SetActiveMonitoring(Value: Boolean);
+procedure TDM.BooksDataChange(Sender: TObject; Field: TField);
+begin
+  if Assigned(FOnDataChange) then
+    FOnDataChange(Sender, Field);
+end;
+
+procedure TDM.DataModuleDestroy(Sender: TObject);
+begin
+  SQLMonitor.Active := False;
+end;
+
+procedure TDM.SetActiveMonitoring(Value: Boolean);
 begin
   SQLMonitor.Active := Value;
 end;
 
-procedure Tdb.SQLMonitorSQL(Sender: TObject; Text: string; Flag: TDATraceFlag);
+procedure TDM.SQLMonitorSQL(Sender: TObject; Text: string; Flag: TDATraceFlag);
 begin
   if Assigned(FOnSQL) then
     FOnSQL(Sender, Text, Flag);

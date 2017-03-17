@@ -9,6 +9,9 @@
         <Projects Include="TestProject.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="SplashTest.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +38,23 @@
     <Target Name="TestProject:Make">
         <MSBuild Projects="TestProject.dproj" Targets="Make"/>
     </Target>
+    <Target Name="SplashTest">
+        <MSBuild Projects="SplashTest.dproj"/>
+    </Target>
+    <Target Name="SplashTest:Clean">
+        <MSBuild Projects="SplashTest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SplashTest:Make">
+        <MSBuild Projects="SplashTest.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="BookManager;TestProject"/>
+        <CallTarget Targets="BookManager;TestProject;SplashTest"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="BookManager:Clean;TestProject:Clean"/>
+        <CallTarget Targets="BookManager:Clean;TestProject:Clean;SplashTest:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="BookManager:Make;TestProject:Make"/>
+        <CallTarget Targets="BookManager:Make;TestProject:Make;SplashTest:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

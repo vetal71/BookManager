@@ -30,10 +30,12 @@ inherited frmEditCategory: TfrmEditCategory
       39)
     inherited btnOK: TcxButton
       Left = 298
+      ModalResult = 1
       ExplicitLeft = 298
     end
     inherited btnCancel: TcxButton
       Left = 423
+      ModalResult = 2
       ExplicitLeft = 423
     end
   end
@@ -70,7 +72,7 @@ inherited frmEditCategory: TfrmEditCategory
       Top = 15
       Anchors = [akLeft, akTop, akRight]
       DataBinding.DataField = 'CategoryName'
-      DataBinding.DataSource = dsCategories
+      DataBinding.DataSource = DM.dsCategories
       TabOrder = 2
       Width = 400
     end
@@ -78,15 +80,16 @@ inherited frmEditCategory: TfrmEditCategory
       Left = 211
       Top = 55
       Anchors = [akLeft, akTop, akRight]
-      DataBinding.DataField = 'Parent'
-      DataBinding.DataSource = dsCategories
+      DataBinding.DataField = 'PARENT_ID'
+      DataBinding.DataSource = DM.dsCategories
       Properties.GridMode = True
-      Properties.KeyFieldNames = 'Self'
+      Properties.KeyFieldNames = 'ID'
       Properties.ListColumns = <
         item
+          Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077' '#1082#1072#1090#1077#1075#1086#1088#1080#1080
           FieldName = 'CategoryName'
         end>
-      Properties.ListSource = dsParents
+      Properties.ListSource = dsCategories
       TabOrder = 3
       Width = 325
     end
@@ -488,120 +491,39 @@ inherited frmEditCategory: TfrmEditCategory
           0000}
       end>
   end
-  object adsCategories: TAureliusDataset
-    FieldDefs = <
-      item
-        Name = 'Self'
-        Attributes = [faReadonly]
-        DataType = ftVariant
-      end
-      item
-        Name = 'ID'
-        Attributes = [faReadonly, faRequired]
-        DataType = ftInteger
-      end
-      item
-        Name = 'CategoryName'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 255
-      end
-      item
-        Name = 'Parent'
-        DataType = ftVariant
-      end
-      item
-        Name = 'Books'
-        Attributes = [faReadonly]
-        DataType = ftDataSet
-      end>
-    IncludeUnmappedObjects = True
-    Left = 96
-    Top = 24
-    DesignClass = 'Model.Entities.TCategory'
-    object adsCategoriesSelf: TAureliusEntityField
-      FieldName = 'Self'
-      ReadOnly = True
-    end
-    object adsCategoriesID: TIntegerField
-      FieldName = 'ID'
-      ReadOnly = True
-      Required = True
-    end
-    object adsCategoriesCategoryName: TStringField
-      FieldName = 'CategoryName'
-      Required = True
-      Size = 255
-    end
-    object adsCategoriesParent: TAureliusEntityField
-      FieldName = 'Parent'
-    end
-    object adsCategoriesBooks: TDataSetField
-      FieldName = 'Books'
-      ReadOnly = True
-    end
+  object dsCategories: TUniDataSource
+    DataSet = qryCategories
+    Left = 134
+    Top = 122
   end
-  object dsCategories: TDataSource
-    DataSet = adsCategories
-    Left = 97
-    Top = 81
-  end
-  object adsParents: TAureliusDataset
-    FieldDefs = <
-      item
-        Name = 'Self'
-        Attributes = [faReadonly]
-        DataType = ftVariant
-      end
-      item
-        Name = 'ID'
-        Attributes = [faReadonly, faRequired]
-        DataType = ftInteger
-      end
-      item
-        Name = 'CategoryName'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 255
-      end
-      item
-        Name = 'Parent'
-        DataType = ftVariant
-      end
-      item
-        Name = 'Books'
-        Attributes = [faReadonly]
-        DataType = ftDataSet
-      end>
-    IncludeUnmappedObjects = False
-    Left = 160
-    Top = 24
-    DesignClass = 'Model.Entities.TCategory'
-    object adsParentsSelf: TAureliusEntityField
-      FieldName = 'Self'
-      ReadOnly = True
-    end
-    object adsParentsID: TIntegerField
-      FieldName = 'ID'
-      ReadOnly = True
-      Required = True
-    end
-    object adsParentsCategoryName: TStringField
-      FieldName = 'CategoryName'
-      Required = True
-      Size = 255
-    end
-    object adsParentsParent: TAureliusEntityField
-      FieldName = 'Parent'
-    end
-    object adsParentsBooks: TDataSetField
-      FieldName = 'Books'
-      ReadOnly = True
-    end
-  end
-  object dsParents: TDataSource
-    DataSet = adsParents
-    Left = 161
-    Top = 81
+  object qryCategories: TUniQuery
+    SQLInsert.Strings = (
+      'INSERT INTO Categories'
+      '  (ID, CATEGORYNAME, PARENT_ID)'
+      'VALUES'
+      '  (:ID, :CATEGORYNAME, :PARENT_ID)')
+    SQLDelete.Strings = (
+      'DELETE FROM Categories'
+      'WHERE'
+      '  ID = :Old_ID')
+    SQLUpdate.Strings = (
+      'UPDATE Categories'
+      'SET'
+      '  ID = :ID, CATEGORYNAME = :CATEGORYNAME, PARENT_ID = :PARENT_ID'
+      'WHERE'
+      '  ID = :Old_ID')
+    SQLRefresh.Strings = (
+      'SELECT ID, CATEGORYNAME, PARENT_ID FROM Categories'
+      'WHERE'
+      '  ID = :ID')
+    SQLRecCount.Strings = (
+      'SELECT count(*) FROM (SELECT * FROM Categories'
+      ')')
+    Connection = DM.conn
+    SQL.Strings = (
+      'select * from Categories'
+      'order by CategoryName')
+    Left = 56
+    Top = 122
   end
 end

@@ -55,8 +55,6 @@ type
   private
     Connection: TUniConnection;
   private
-    FMainView: TForm;
-
     procedure ShowSqlMonitorForm;
     procedure ShowLibraryForm;
     procedure BooksDataChange(Sender: TObject; Field: TField);
@@ -68,7 +66,7 @@ var
 implementation
 
 uses
-
+  Common.DatabaseUtils,
   Form.MainView;
 
 {$R *.dfm}
@@ -80,7 +78,7 @@ end;
 
 procedure TfrmMain.actRefreshLibraryExecute(Sender: TObject);
 begin
-  //FillData(Connection);
+  FillData;
 end;
 
 procedure TfrmMain.BooksDataChange(Sender: TObject; Field: TField);
@@ -102,11 +100,10 @@ var
   F: TfrmLibraryView;
 begin
   F := TfrmLibraryView.Create(Application);
-  FMainView := F;
   F.Parent := tsMainView;
   F.Align := alClient;
   F.BorderStyle := bsNone;
-  //F.OnDataChange := BooksDataChange;
+  DM.OnDataChange := BooksDataChange;
   F.Show;
   sbMain.Panels[1].Text := Format('Всего книг в библиотеке: %d штук', [F.BookCount]);
 end;

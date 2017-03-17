@@ -28,23 +28,16 @@ uses
   dxSkinTheAsphaltWorld, dxSkinsDefaultPainters, dxSkinValentine,
   dxSkinVisualStudio2013Blue, dxSkinVisualStudio2013Dark,
   dxSkinVisualStudio2013Light, dxSkinVS2010, dxSkinWhiteprint,
-  dxSkinXmas2008Blue, cxInplaceContainer, cxTLData, cxDBTL, cxMaskEdit;
+  dxSkinXmas2008Blue, cxInplaceContainer, cxTLData, cxDBTL, cxMaskEdit,
+  Uni, SQLiteUniProvider;
 
 type
   TForm1 = class(TForm)
     btn1: TButton;
-    dbg2: TDBGrid;
-    lst1: TcxDBTreeList;
-    lst1cxDBTreeListColumn1: TcxDBTreeListColumn;
-    lst1cxDBTreeListColumn2: TcxDBTreeListColumn;
-    lst1cxDBTreeListColumn3: TcxDBTreeListColumn;
-    lst1cxDBTreeListColumn4: TcxDBTreeListColumn;
-    procedure FormCreate(Sender: TObject);
+    mmo1: TMemo;
     procedure btn1Click(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
   private
-    FDBConnection: IDBConnection;
-    FManager: TObjectManager;
+
   public
     { Public declarations }
   end;
@@ -58,42 +51,31 @@ implementation
 
 procedure TForm1.btn1Click(Sender: TObject);
 var
-  Category: TCategory;
+  UniConnection: TUniConnection;
+  UniQuery: TUniQuery;
 begin
-  Category := TCategory.Create;
-  Category.CategoryName := 'Все книги';
-  FManager.Save(Category);
-end;
-
-procedure TForm1.FormCreate(Sender: TObject);
-var
-  FDBManager: TDatabaseManager;
-  Categories: TList<TCategory>;
-begin
-  FDBConnection := TSQLiteConnectionModule.CreateConnection;
-  FDBManager := TDatabaseManager.Create(FDBConnection);
+  UniConnection := TUniConnection.Create(nil);
   try
-    FDBManager.UpdateDatabase;
+    UniConnection.ConnectString := 'Provider Name=SQLite;Data Source=:memory:';
+    UniConnection.Connect;
+    mmo1.Lines.Add('SQLite version: ' +  UniConnection.ClientVersion); //3.8.5
+    mmo1.Lines.Add('UniDAC Version: ' + UniDACVersion); //5.5.12
+    UniConnection.ExecSQL('create table visits(id integer, from_visit integer)');
+    UniConnection.ExecSQL('create table path(id integer, from_visit integer)');
+    UniConnection.ExecSQL('insert into visits values(27585, 1)');
+    UniConnection.ExecSQL('insert into path values(1, 1)');
+    UniQuery := TUniQuery.Create(nil);
+    try
+      UniQuery.Connection := UniConnection;
+      UniQuery.SQL.Text := 'with recursive path as (select id, from_visit from visits where visits.id=27585 union all select visits.id, visits.from_visit from path join visits on (path.from_visit = visits.id) ) select * from path';
+      UniQuery.Open;
+      mmo1.Lines.Add('Record Count: ' + IntToStr(UniQuery.RecordCount)); //1
+    finally
+      UniQuery.Free;
+    end;
   finally
-    FDBManager.Free;
+    UniConnection.Free;
   end;
-
-  FManager := TObjectManager.Create(FDBConnection);
-
-  Categories := FManager.Find<TCategory>.List;
-  SQLiteConnectionModule.AureliusDataset1.SetSourceList(Categories);
-  SQLiteConnectionModule.AureliusDataset1.Manager := FManager;
-  SQLiteConnectionModule.AureliusDataset1.Open;
-
-  SQLiteConnectionModule.AureliusDataset2.DatasetField :=
-    SQLiteConnectionModule.AureliusDataset1.FieldByName('Books') as TDataSetField;
-//  SQLiteConnectionModule.AureliusDataset2.SetSourceList(FManager.Find<TBook>.List);
-  SQLiteConnectionModule.AureliusDataset2.Open;
-end;
-
-procedure TForm1.FormDestroy(Sender: TObject);
-begin
-  FManager.Free;
 end;
 
 end.

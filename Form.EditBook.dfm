@@ -1,67 +1,70 @@
 inherited frmEditBook: TfrmEditBook
   Caption = #1056#1077#1076#1072#1082#1090#1086#1088' '#1082#1085#1080#1075
-  ClientHeight = 232
-  ClientWidth = 915
+  ClientHeight = 248
+  ClientWidth = 875
   Constraints.MinHeight = 260
   Constraints.MinWidth = 600
-  ExplicitWidth = 921
-  ExplicitHeight = 260
+  ExplicitWidth = 881
+  ExplicitHeight = 276
   PixelsPerInch = 96
   TextHeight = 20
   inherited bvlTop: TBevel
-    Width = 915
+    Width = 875
     ExplicitWidth = 669
   end
   inherited bvlBottom: TBevel
-    Top = 191
-    Width = 915
+    Top = 207
+    Width = 875
     ExplicitTop = 191
     ExplicitWidth = 669
   end
   inherited pnlButton: TPanel
-    Top = 193
-    Width = 915
+    Top = 209
+    Width = 875
     ExplicitTop = 193
     ExplicitWidth = 915
     DesignSize = (
-      915
+      875
       39)
     inherited btnOK: TcxButton
-      Left = 664
+      Left = 624
       ExplicitLeft = 664
     end
     inherited btnCancel: TcxButton
-      Left = 789
+      Left = 749
+      ModalResult = 2
       ExplicitLeft = 789
     end
   end
   inherited pnlHeader: TPanel
-    Width = 915
+    Width = 875
     ExplicitWidth = 915
   end
   inherited pnlEditor: TPanel
-    Width = 915
-    Height = 140
-    ExplicitWidth = 915
-    ExplicitHeight = 140
+    Width = 875
+    Height = 156
+    ExplicitLeft = 48
+    ExplicitTop = 163
+    ExplicitWidth = 875
+    ExplicitHeight = 212
     DesignSize = (
-      915
-      140)
+      875
+      156)
     object lblCategoryName: TcxLabel
       Left = 16
-      Top = 57
+      Top = 80
       Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077':'
       Transparent = True
     end
     object lblParentCategory: TcxLabel
       Left = 16
-      Top = 15
+      Top = 38
       Caption = #1050#1072#1090#1077#1075#1086#1088#1080#1103':'
       Transparent = True
     end
     object btnAddCategory: TcxButton
-      Left = 881
-      Top = 14
+      Left = 841
+      Top = 36
       Width = 28
       Height = 28
       Anchors = [akTop, akRight]
@@ -101,17 +104,18 @@ inherited frmEditBook: TfrmEditBook
         3E5330536F913C688CB44579A5D45491C6FF4377A2D4386388B52C4D6B92182A
         3B54000000040000000100000000000000000000000000000000}
       PaintStyle = bpsGlyph
-      TabOrder = 4
+      TabOrder = 3
+      OnClick = btnAddCategoryClick
     end
     object lblFileLink: TcxLabel
       Left = 16
-      Top = 97
+      Top = 120
       Caption = #1055#1091#1090#1100' '#1082' '#1092#1072#1081#1083#1091':'
       Transparent = True
     end
     object btnFileLink: TcxButton
-      Left = 881
-      Top = 96
+      Left = 841
+      Top = 119
       Width = 28
       Height = 28
       Anchors = [akTop, akRight]
@@ -151,33 +155,51 @@ inherited frmEditBook: TfrmEditBook
         0000000000000000000000000000000000000000000000000000000000000000
         00031220184F616247CAB88862FA926B4CCB34251A5200000005}
       PaintStyle = bpsGlyph
-      TabOrder = 7
+      TabOrder = 6
+      OnClick = btnFileLinkClick
     end
     object edtBookName: TcxDBTextEdit
       Left = 136
-      Top = 56
+      Top = 79
       Anchors = [akLeft, akTop, akRight]
       DataBinding.DataField = 'BookName'
-      DataBinding.DataSource = dsBooks
+      DataBinding.DataSource = DM.Books
       TabOrder = 1
-      Width = 773
+      Width = 733
     end
     object edtFileLink: TcxDBTextEdit
       Left = 136
-      Top = 96
+      Top = 119
       Anchors = [akLeft, akTop, akRight]
       DataBinding.DataField = 'BookLink'
-      DataBinding.DataSource = dsBooks
-      TabOrder = 6
-      Width = 740
+      DataBinding.DataSource = DM.Books
+      TabOrder = 5
+      Width = 700
     end
-    object cbbParentCategory: TcxComboBox
+    object cbbParentCategory: TcxDBLookupComboBox
       Left = 136
-      Top = 14
+      Top = 37
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 3
-      Text = 'cbbParentCategory'
-      Width = 740
+      DataBinding.DataField = 'CATEGORY_ID'
+      DataBinding.DataSource = DM.Books
+      Properties.GridMode = True
+      Properties.KeyFieldNames = 'ID'
+      Properties.ListColumns = <
+        item
+          Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077' '#1082#1072#1090#1077#1075#1086#1088#1080#1080
+          FieldName = 'CATEGORYNAME'
+        end>
+      Properties.ListSource = dsCategories
+      Properties.OnChange = cbbParentCategoryPropertiesChange
+      TabOrder = 7
+      Width = 700
+    end
+    object edtFullCategory: TcxTextEdit
+      Left = 136
+      Top = 6
+      Properties.ReadOnly = True
+      TabOrder = 8
+      Width = 700
     end
   end
   inherited ilSmall: TcxImageList
@@ -577,116 +599,39 @@ inherited frmEditBook: TfrmEditBook
           0000}
       end>
   end
-  object adsCategories: TAureliusDataset
-    FieldDefs = <
-      item
-        Name = 'Self'
-        Attributes = [faReadonly]
-        DataType = ftVariant
-      end
-      item
-        Name = 'ID'
-        Attributes = [faReadonly, faRequired]
-        DataType = ftInteger
-      end
-      item
-        Name = 'CategoryName'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 255
-      end
-      item
-        Name = 'Parent'
-        DataType = ftVariant
-      end
-      item
-        Name = 'Books'
-        Attributes = [faReadonly]
-        DataType = ftDataSet
-      end>
-    IncludeUnmappedObjects = True
-    Left = 80
-    Top = 88
-    DesignClass = 'Model.Entities.TCategory'
-    object adsCategoriesSelf: TAureliusEntityField
-      FieldName = 'Self'
-      ReadOnly = True
-    end
-    object adsCategoriesID: TIntegerField
-      FieldName = 'ID'
-      ReadOnly = True
-      Required = True
-    end
-    object adsCategoriesCategoryName: TStringField
-      FieldName = 'CategoryName'
-      Required = True
-      Size = 255
-    end
-    object adsCategoriesParent: TAureliusEntityField
-      FieldName = 'Parent'
-    end
-    object adsCategoriesBooks: TDataSetField
-      FieldName = 'Books'
-      ReadOnly = True
-    end
+  object qryCategories: TUniQuery
+    SQLInsert.Strings = (
+      'INSERT INTO Categories'
+      '  (ID, CATEGORYNAME, PARENT_ID)'
+      'VALUES'
+      '  (:ID, :CATEGORYNAME, :PARENT_ID)')
+    SQLDelete.Strings = (
+      'DELETE FROM Categories'
+      'WHERE'
+      '  ID = :Old_ID')
+    SQLUpdate.Strings = (
+      'UPDATE Categories'
+      'SET'
+      '  ID = :ID, CATEGORYNAME = :CATEGORYNAME, PARENT_ID = :PARENT_ID'
+      'WHERE'
+      '  ID = :Old_ID')
+    SQLRefresh.Strings = (
+      'SELECT ID, CATEGORYNAME, PARENT_ID FROM Categories'
+      'WHERE'
+      '  ID = :ID')
+    SQLRecCount.Strings = (
+      'SELECT count(*) FROM (SELECT * FROM Categories'
+      ')')
+    Connection = DM.conn
+    SQL.Strings = (
+      'select * from Categories'
+      'order by CategoryName')
+    Left = 56
+    Top = 122
   end
-  object dsCategories: TDataSource
-    DataSet = adsCategories
-    Left = 81
-    Top = 145
-  end
-  object adsBooks: TAureliusDataset
-    FieldDefs = <
-      item
-        Name = 'Self'
-        Attributes = [faReadonly]
-        DataType = ftVariant
-      end
-      item
-        Name = 'ID'
-        Attributes = [faReadonly, faRequired]
-        DataType = ftInteger
-      end
-      item
-        Name = 'BookName'
-        Attributes = [faRequired]
-        DataType = ftString
-        Size = 255
-      end
-      item
-        Name = 'BookLink'
-        DataType = ftString
-        Size = 255
-      end>
-    IncludeUnmappedObjects = False
-    Left = 160
-    Top = 88
-    DesignClass = 'Model.Entities.TBook'
-    object adsBooksSelf: TAureliusEntityField
-      FieldName = 'Self'
-      ReadOnly = True
-    end
-    object adsBooksID: TIntegerField
-      FieldName = 'ID'
-      ReadOnly = True
-      Required = True
-    end
-    object adsBooksBookName: TStringField
-      FieldName = 'BookName'
-      Required = True
-      Size = 255
-    end
-    object adsBooksBookLink: TStringField
-      FieldName = 'BookLink'
-      Size = 255
-    end
-    object adsBooksCategory: TAureliusEntityField
-      FieldName = 'BooksCategory'
-    end
-  end
-  object dsBooks: TDataSource
-    DataSet = adsBooks
-    Left = 161
-    Top = 144
+  object dsCategories: TUniDataSource
+    DataSet = qryCategories
+    Left = 134
+    Top = 122
   end
 end

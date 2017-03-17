@@ -8,10 +8,9 @@ uses
   cxLookAndFeels, cxLookAndFeelPainters, Vcl.Menus, dxSkinsCore,
   dxSkinMetropolis, cxClasses, dxSkinsForm, Vcl.StdCtrls, cxButtons,
   Vcl.ExtCtrls, cxControls, cxContainer, cxEdit, cxMaskEdit, cxDropDownEdit,
-  cxTextEdit, cxLabel, Vcl.Buttons,
-  Model.Entities, Aurelius.Bind.Dataset, Aurelius.Engine.ObjectManager,
+  cxTextEdit, cxLabel, Vcl.Buttons, ConnectionModule, Common.Utils,
   System.ImageList, Vcl.ImgList, Data.DB, cxDBEdit, cxLookupEdit,
-  cxDBLookupEdit, cxDBLookupComboBox;
+  cxDBLookupEdit, cxDBLookupComboBox, DBAccess, Uni, MemDS, dxdbtrel;
 
 type
   TfrmEditBook = class(TfrmBaseEditor)
@@ -20,30 +19,21 @@ type
     btnAddCategory: TcxButton;
     lblFileLink: TcxLabel;
     btnFileLink: TcxButton;
-    adsCategories: TAureliusDataset;
-    adsCategoriesSelf: TAureliusEntityField;
-    adsCategoriesID: TIntegerField;
-    adsCategoriesCategoryName: TStringField;
-    adsCategoriesParent: TAureliusEntityField;
-    adsCategoriesBooks: TDataSetField;
-    dsCategories: TDataSource;
-    adsBooks: TAureliusDataset;
-    adsBooksSelf: TAureliusEntityField;
-    adsBooksID: TIntegerField;
-    adsBooksBookName: TStringField;
-    adsBooksBookLink: TStringField;
-    dsBooks: TDataSource;
     edtBookName: TcxDBTextEdit;
     edtFileLink: TcxDBTextEdit;
-    cbbParentCategory: TcxComboBox;
-    adsBooksCategory: TAureliusEntityField;
+    qryCategories: TUniQuery;
+    dsCategories: TUniDataSource;
+    cbbParentCategory: TcxDBLookupComboBox;
+    edtFullCategory: TcxTextEdit;
     procedure btnOKClick(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
+    procedure btnFileLinkClick(Sender: TObject);
+    procedure btnAddCategoryClick(Sender: TObject);
+    procedure cbbParentCategoryPropertiesChange(Sender: TObject);
   private
-    procedure SetBook(ABook: TBook; AManager: TObjectManager);
-    procedure LoadCategory;
+    function GetFullCategory: string;
   public
-    class function Edit(ABook: TBook; AManager: TObjectManager): Boolean;
+    class function Edit(AMode: TEditMode): Boolean;
   end;
 
 var
@@ -52,86 +42,94 @@ var
 implementation
 
 uses
-  ConnectionModule,
-  Common.Utils,
-  System.Generics.Collections;
+  Form.EditCategory;
 
 {$R *.dfm}
 
 { TfrmEditBook }
 
+procedure TfrmEditBook.btnAddCategoryClick(Sender: TObject);
+begin
+  if TfrmEditCategory.Edit(emAppend) then begin
+    qryCategories.Active := False;
+    qryCategories.Active := True;
+  end;
+end;
+
 procedure TfrmEditBook.btnCancelClick(Sender: TObject);
 begin
-  adsBooks.Cancel;
+  DM.qryBooks.Cancel;
   inherited;
+end;
+
+procedure TfrmEditBook.btnFileLinkClick(Sender: TObject);
+begin
+  with TOpenDialog.Create(nil) do try
+    Filter := 'Файлы книг|*.pdf;*.djvu;*.epab;*.chm';
+    if Execute then
+      edtFileLink.Text := FileName;
+  finally
+    Free;
+  end;
 end;
 
 procedure TfrmEditBook.btnOKClick(Sender: TObject);
 begin
   try
-    if cbbParentCategory.ItemIndex >= 0 then
-      adsBooks.EntityFieldByName('BooksCategory').AsObject :=
-        TCategory(cbbParentCategory.ItemObject);
-    adsBooks.Post;
+    DM.qryBooks.Post;
   except on E: Exception do begin
     ShowErrorFmt('Не удалось сохранить книгу "%s"'#10#13+'%s', [edtBookName.Text, E.Message]);
-    adsBooks.Cancel;
+    DM.qryBooks.Cancel;
     ModalResult := mrCancel;
     end;
   end;
   inherited;
 end;
 
-class function TfrmEditBook.Edit(ABook: TBook; AManager: TObjectManager): Boolean;
+procedure TfrmEditBook.cbbParentCategoryPropertiesChange(Sender: TObject);
+begin
+  inherited;
+  edtFullCategory.Text := GetFullCategory;
+end;
+
+class function TfrmEditBook.Edit(AMode: TEditMode): Boolean;
 var
   Form: TfrmEditBook;
-  BookName: string;
 begin
   Form := TfrmEditBook.Create(Application);
   try
-    BookName := ABook.BookName;
-    if BookName.IsEmpty then
+    if AMode = emAppend then
       Form.Header := 'Новая книга'
     else
-      Form.Header := Format('Редактирование книги: %s', [BookName]);
-    Form.SetBook(ABook, AManager);
+      Form.Header := Format('Редактирование книги: %s', [DM.qryBooks.FieldValues['BookName']]);
+    Form.qryCategories.Open;
     Result := Form.ShowModal = mrOk;
   finally
     Form.Free;
   end;
 end;
 
-procedure TfrmEditBook.SetBook(ABook: TBook; AManager: TObjectManager);
+function TfrmEditBook.GetFullCategory: string;
+const
+  cSQL =
+    'with recursive m(path, id) as ( '#13#10 +
+    '    select categoryname path, id from categories where parent_id is null '#13#10 +
+    '    union all '#13#10 +
+    '    select path || '' -> '' || t.categoryname, t.id  '#13#10 +
+    '    from categories t, m where t.parent_id = m.id '#13#10 +
+    ') select * from m '#13#10 +
+    'where id = :id;';
 begin
-  // открытие DS
-  with adsCategories do begin
-    Close;
-    SetSourceCriteria(AManager.Find<TCategory>.OrderBy('CategoryName'));
+  Result := '';
+  with TUniQuery.Create(nil) do try
+    Connection := DM.conn;
+    SQL.Text := cSQL;
+    ParamByName('ID').AsInteger := qryCategories.FieldByName('ID').AsInteger;
     Open;
-  end;
-
-  with adsBooks do begin
-    Close;
-    SetSourceObject(ABook);
-    Open;
-    Edit;
-  end;
-
-  LoadCategory;
-//  if Assigned(ABook.BooksCategory) then
-//    cbbParentCategory.ItemIndex := cbbParentCategory.Properties.Items.IndexOf( ABook.BooksCategory.CategoryName );
-  cbbParentCategory.ItemObject := ABook.BooksCategory;
-end;
-
-procedure TfrmEditBook.LoadCategory;
-var
-  C: TCategory;
-begin
-  cbbParentCategory.Properties.Items.Clear;
-  while not adsCategories.Eof do begin
-    C := adsCategories.EntityFieldByName('Self').AsEntity<TCategory>;
-    cbbParentCategory.Properties.Items.AddObject(C.CategoryName, C);
-    adsCategories.Next;
+    if not IsEmpty then
+      Result := FieldValues['Path'];
+  finally
+    Free;
   end;
 end;
 

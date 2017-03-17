@@ -1,11 +1,13 @@
-object db: Tdb
+object DM: TDM
   OldCreateOrder = True
+  OnDestroy = DataModuleDestroy
   Height = 422
   Width = 602
   object conn: TUniConnection
     ProviderName = 'SQLite'
     Database = 'd:\DevProjects\BookManager\WorkLibrary.db'
     Options.KeepDesignConnected = False
+    Connected = True
     LoginPrompt = False
     Left = 32
     Top = 16
@@ -15,22 +17,25 @@ object db: Tdb
     Top = 16
   end
   object SQLMonitor: TUniSQLMonitor
-    TraceFlags = [tfQPrepare, tfQExecute, tfError, tfStmt, tfConnect, tfTransact, tfMisc, tfParams]
+    Options = [moDialog, moSQLMonitor, moDBMonitor, moCustom, moHandled]
+    TraceFlags = [tfQPrepare, tfQExecute, tfQFetch, tfError, tfStmt, tfConnect, tfTransact, tfBlob, tfService, tfMisc, tfParams, tfObjDestroy, tfPool]
     OnSQL = SQLMonitorSQL
     Left = 200
     Top = 16
   end
   object Books: TUniDataSource
     DataSet = qryBooks
+    OnDataChange = BooksDataChange
     Left = 110
     Top = 120
   end
   object qryBooks: TUniQuery
+    KeyFields = 'ID'
     SQLInsert.Strings = (
       'INSERT INTO Books'
-      '  (ID, BOOKNAME, BOOKLINK, BOOKS_CATEGORY_ID)'
+      '  (ID, BOOKNAME, BOOKLINK, CATEGORY_ID)'
       'VALUES'
-      '  (:ID, :BOOKNAME, :BOOKLINK, :BOOKS_CATEGORY_ID)')
+      '  (:ID, :BOOKNAME, :BOOKLINK, :CATEGORY_ID)')
     SQLDelete.Strings = (
       'DELETE FROM Books'
       'WHERE'
@@ -39,12 +44,12 @@ object db: Tdb
       'UPDATE Books'
       'SET'
       
-        '  ID = :ID, BOOKNAME = :BOOKNAME, BOOKLINK = :BOOKLINK, BOOKS_CA' +
-        'TEGORY_ID = :BOOKS_CATEGORY_ID'
+        '  ID = :ID, BOOKNAME = :BOOKNAME, BOOKLINK = :BOOKLINK, CATEGORY' +
+        '_ID = :CATEGORY_ID'
       'WHERE'
       '  ID = :Old_ID')
     SQLRefresh.Strings = (
-      'SELECT ID, BOOKNAME, BOOKLINK, BOOKS_CATEGORY_ID FROM Books'
+      'SELECT ID, BOOKNAME, BOOKLINK, CATEGORY_ID FROM Books'
       'WHERE'
       '  ID = :ID')
     SQLRecCount.Strings = (
@@ -56,7 +61,9 @@ object db: Tdb
       'order by id')
     MasterSource = dsCategories
     MasterFields = 'ID'
-    DetailFields = 'BOOKS_CATEGORY_ID'
+    DetailFields = 'CATEGORY_ID'
+    Debug = True
+    Options.RequiredFields = False
     Left = 40
     Top = 120
     ParamData = <
@@ -72,6 +79,7 @@ object db: Tdb
     Top = 184
   end
   object qryCategories: TUniQuery
+    KeyFields = 'ID'
     SQLInsert.Strings = (
       'INSERT INTO Categories'
       '  (ID, CATEGORYNAME, PARENT_ID)'
@@ -98,6 +106,8 @@ object db: Tdb
     SQL.Strings = (
       'select * from Categories'
       'order by id')
+    Debug = True
+    Options.RequiredFields = False
     Left = 40
     Top = 184
   end

@@ -14,6 +14,8 @@ type
 
   TFileRecordList = TList<TFileRecord>;
 
+  TEditMode = (emAppend, emEdit);
+
 procedure FindAllFiles(FilesList: TFileRecordList; StartDir: string; const FileMasks: array of string);
 
 procedure ShowError(AMsg: string);
@@ -88,7 +90,7 @@ begin
     // проверка по маске
     FileExt := ExtractFileExt(SR.Name);
     if FileExt > '' then
-      FileExt := Copy(FileExt, 2, 3);
+      FileExt := Copy(FileExt, 2, Length(FileExt) - 1);
     if MatchText(FileExt, FileMasks) then
       FilesList.Add( FR );
     IsFound := FindNext(SR) = 0;

@@ -1,18 +1,18 @@
 inherited frmMain: TfrmMain
   Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075
-  ClientHeight = 439
-  ClientWidth = 809
+  ClientHeight = 549
+  ClientWidth = 959
   ShowHint = True
   WindowState = wsMaximized
   OnShow = FormShow
-  ExplicitWidth = 825
-  ExplicitHeight = 477
+  ExplicitWidth = 975
+  ExplicitHeight = 587
   PixelsPerInch = 96
   TextHeight = 20
   object sbMain: TdxStatusBar [0]
     Left = 0
-    Top = 419
-    Width = 809
+    Top = 529
+    Width = 959
     Height = 20
     Panels = <
       item
@@ -34,28 +34,38 @@ inherited frmMain: TfrmMain
     Font.Height = -11
     Font.Name = 'Segoe UI'
     Font.Style = []
+    ExplicitTop = 419
+    ExplicitWidth = 809
   end
   object pgcMain: TcxPageControl [1]
     Left = 0
     Top = 71
-    Width = 809
-    Height = 348
+    Width = 959
+    Height = 458
     Align = alClient
     TabOrder = 5
     Properties.ActivePage = tsMainView
     Properties.CustomButtons.Buttons = <>
     Properties.Options = [pcoAlwaysShowGoDialogButton, pcoGoDialog, pcoGradient, pcoGradientClientArea, pcoRedrawOnResize]
-    ClientRectBottom = 346
+    ExplicitWidth = 809
+    ExplicitHeight = 348
+    ClientRectBottom = 456
     ClientRectLeft = 2
-    ClientRectRight = 807
+    ClientRectRight = 957
     ClientRectTop = 35
     object tsMainView: TcxTabSheet
       Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075
       ImageIndex = 0
+      ExplicitWidth = 805
+      ExplicitHeight = 311
     end
     object tsSQLMonitor: TcxTabSheet
       Caption = #1052#1086#1085#1080#1090#1086#1088#1080#1085#1075' '#1079#1072#1087#1088#1086#1089#1086#1074
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
   end
   inherited sknMain: TdxSkinController
