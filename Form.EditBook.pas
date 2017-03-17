@@ -49,11 +49,21 @@ uses
 { TfrmEditBook }
 
 procedure TfrmEditBook.btnAddCategoryClick(Sender: TObject);
+//var
+//  CategoryBookmark, Bookmark: TBookmark;
 begin
-  if TfrmEditCategory.Edit(emAppend) then begin
-    qryCategories.Active := False;
-    qryCategories.Active := True;
-  end;
+//  if DM.qryCategories.Active then
+//    CategoryBookmark := DM.qryCategories.GetBookmark;
+//  if DM.qryBooks.Active then
+//    Bookmark := DM.qryBooks.GetBookmark;
+//  qryCategories.Append;
+//  if TfrmEditCategory.Edit(emAppend) then begin
+//    qryCategories.Active := False;
+//    qryCategories.Active := True;
+//  end;
+  //qryCategories.GotoBookmark(CategoryBookmark);
+//  DM.qryBooks.GotoBookmark(Bookmark);
+
 end;
 
 procedure TfrmEditBook.btnCancelClick(Sender: TObject);

@@ -12,7 +12,7 @@ uses
   cxGridLevel, cxGridCustomTableView, cxGridTableView, cxGridDBTableView,
   cxGridCustomView, cxGrid, cxSplitter, cxInplaceContainer, cxDBTL, cxTLData,
   Vcl.ComCtrls, Vcl.ToolWin, Vcl.ExtCtrls, dxActivityIndicator,
-  System.Generics.Collections,
+  System.Generics.Collections, Uni,
   ConnectionModule,
   cxContainer, cxTextEdit, Vcl.StdCtrls, System.Actions, Vcl.ActnList;
 
@@ -187,7 +187,16 @@ end;
 
 function TfrmLibraryView.GetBookCount: Integer;
 begin
-  Result := DM.qryBooks.RecordCount;
+  with TUniQuery.Create(nil) do try
+    Connection := DM.conn;
+    SQL.Text := 'select count(*) as Cnt from Books';
+    Open;
+    if not IsEmpty then
+      Result := FieldByName('Cnt').AsInteger;
+    Close;
+  finally
+    Free;
+  end;
 end;
 
 procedure TfrmLibraryView.LoadData;
