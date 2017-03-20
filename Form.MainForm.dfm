@@ -8,7 +8,7 @@ inherited frmMain: TfrmMain
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   ExplicitWidth = 975
-  ExplicitHeight = 587
+  ExplicitHeight = 588
   PixelsPerInch = 96
   TextHeight = 20
   object sbMain: TdxStatusBar [0]

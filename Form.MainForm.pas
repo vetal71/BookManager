@@ -99,7 +99,7 @@ begin
       ResourceIndex := -1;
       LocalFile := DM.DBFile;
       UploadFile(ExtractFileName(DM.DBFile));
-      ShowMessage('Готово!!!');
+      ShowInfo('Файл базы данных успешно сохранен в Google Drive.');
     except on ex: EInGoogle do
       ShowError('Ошибка сохранения файла в Google Drive: ' + ex.Message);
     end;
