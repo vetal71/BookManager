@@ -1,4 +1,5 @@
 inherited frmEditBook: TfrmEditBook
+  ActiveControl = cbbCategory
   Caption = #1056#1077#1076#1072#1082#1090#1086#1088' '#1082#1085#1080#1075
   ClientHeight = 248
   ClientWidth = 875
@@ -21,36 +22,34 @@ inherited frmEditBook: TfrmEditBook
   inherited pnlButton: TPanel
     Top = 209
     Width = 875
-    ExplicitTop = 193
-    ExplicitWidth = 915
+    ExplicitTop = 209
+    ExplicitWidth = 875
     DesignSize = (
       875
       39)
     inherited btnOK: TcxButton
       Left = 624
-      ExplicitLeft = 664
+      ExplicitLeft = 624
     end
     inherited btnCancel: TcxButton
       Left = 749
       ModalResult = 2
-      ExplicitLeft = 789
+      ExplicitLeft = 749
     end
   end
   inherited pnlHeader: TPanel
     Width = 875
-    ExplicitWidth = 915
+    ExplicitWidth = 875
   end
   inherited pnlEditor: TPanel
     Width = 875
     Height = 156
-    ExplicitLeft = 48
-    ExplicitTop = 163
     ExplicitWidth = 875
-    ExplicitHeight = 212
+    ExplicitHeight = 156
     DesignSize = (
       875
       156)
-    object lblCategoryName: TcxLabel
+    object lblBookName: TcxLabel
       Left = 16
       Top = 80
       Caption = #1053#1072#1080#1084#1077#1085#1086#1074#1072#1085#1080#1077':'
@@ -105,6 +104,7 @@ inherited frmEditBook: TfrmEditBook
         3B54000000040000000100000000000000000000000000000000}
       PaintStyle = bpsGlyph
       TabOrder = 3
+      TabStop = False
       OnClick = btnAddCategoryClick
     end
     object lblFileLink: TcxLabel
@@ -155,7 +155,8 @@ inherited frmEditBook: TfrmEditBook
         0000000000000000000000000000000000000000000000000000000000000000
         00031220184F616247CAB88862FA926B4CCB34251A5200000005}
       PaintStyle = bpsGlyph
-      TabOrder = 6
+      TabOrder = 8
+      TabStop = False
       OnClick = btnFileLinkClick
     end
     object edtBookName: TcxDBTextEdit
@@ -164,7 +165,7 @@ inherited frmEditBook: TfrmEditBook
       Anchors = [akLeft, akTop, akRight]
       DataBinding.DataField = 'BookName'
       DataBinding.DataSource = DM.Books
-      TabOrder = 1
+      TabOrder = 5
       Width = 733
     end
     object edtFileLink: TcxDBTextEdit
@@ -173,16 +174,17 @@ inherited frmEditBook: TfrmEditBook
       Anchors = [akLeft, akTop, akRight]
       DataBinding.DataField = 'BookLink'
       DataBinding.DataSource = DM.Books
-      TabOrder = 5
+      TabOrder = 7
       Width = 700
     end
-    object cbbParentCategory: TcxDBLookupComboBox
+    object cbbCategory: TcxDBLookupComboBox
       Left = 136
       Top = 37
       Anchors = [akLeft, akTop, akRight]
       DataBinding.DataField = 'CATEGORY_ID'
       DataBinding.DataSource = DM.Books
-      Properties.GridMode = True
+      Properties.DropDownListStyle = lsFixedList
+      Properties.DropDownRows = 15
       Properties.KeyFieldNames = 'ID'
       Properties.ListColumns = <
         item
@@ -191,14 +193,16 @@ inherited frmEditBook: TfrmEditBook
         end>
       Properties.ListSource = dsCategories
       Properties.OnChange = cbbParentCategoryPropertiesChange
-      TabOrder = 7
+      Properties.OnEditValueChanged = cbbParentCategoryPropertiesChange
+      TabOrder = 2
       Width = 700
     end
     object edtFullCategory: TcxTextEdit
       Left = 136
       Top = 6
+      TabStop = False
       Properties.ReadOnly = True
-      TabOrder = 8
+      TabOrder = 0
       Width = 700
     end
   end

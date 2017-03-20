@@ -110,13 +110,25 @@ end;
 
 procedure TfrmLibraryView.btnDelBookClick(Sender: TObject);
 var
-  BookName: string;
+  BookName, BookLink: string;
+
 begin
   BookName := DM.qryBooks.FieldByName('BookName').asString;
+  BookLink := DM.qryBooks.FieldByName('BookLink').AsString;
   if ShowConfirmFmt(rsConfirmDeleteRecord, ['книгу', BookName]) then begin
+    DM.conn.StartTransaction;
     try
       DM.qryBooks.Delete;
+      if FileExists(BookLink) then begin
+        if ShowConfirm('Удалить файл с диска ?') then begin
+          if not DeleteFile(BookLink) then begin
+            raise Exception.CreateFmt('Не удалось удалить книгу. Код ошибки', [ GetLastError ]);
+          end;
+        end;
+      end;
+      DM.conn.Commit;
     except
+      DM.conn.Rollback;
       ShowErrorFmt(rsErrorDeleteRecord, [BookName]);
     end;
   end;

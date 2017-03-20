@@ -18,12 +18,14 @@ type
     procedure SQLMonitorSQL(Sender: TObject; Text: string; Flag: TDATraceFlag);
     procedure BooksDataChange(Sender: TObject; Field: TField);
     procedure DataModuleDestroy(Sender: TObject);
+    procedure qryBooksAfterDelete(DataSet: TDataSet);
   private
     FDBFile: string;
     FOnSQL: TOnSQLEvent;
     FActiveMonitoring: Boolean;
     FApplicationError: Boolean;
     FOnDataChange: TDataChangeEvent;
+    FOnAfterDelete: TDataSetNotifyEvent;
   private
     procedure SetDBFile(Value: string);
     procedure SetActiveMonitoring(Value: Boolean);
@@ -33,6 +35,7 @@ type
     property ActiveMonitoring: Boolean read FActiveMonitoring write SetActiveMonitoring;
     property ApplicationError: Boolean read FApplicationError default False;
     property OnDataChange: TDataChangeEvent read FOnDataChange write FOnDataChange;
+    property OnDeleteBook: TDataSetNotifyEvent read FOnAfterDelete write FOnAfterDelete;
   end;
 
 var
@@ -91,6 +94,12 @@ end;
 procedure TDM.DataModuleDestroy(Sender: TObject);
 begin
   SQLMonitor.Active := False;
+end;
+
+procedure TDM.qryBooksAfterDelete(DataSet: TDataSet);
+begin
+  if Assigned(FOnAfterDelete) then
+    FOnAfterDelete(DataSet);
 end;
 
 procedure TDM.SetActiveMonitoring(Value: Boolean);

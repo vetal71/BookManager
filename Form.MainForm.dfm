@@ -2,8 +2,10 @@ inherited frmMain: TfrmMain
   Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072' '#1082#1085#1080#1075
   ClientHeight = 549
   ClientWidth = 959
+  KeyPreview = True
   ShowHint = True
   WindowState = wsMaximized
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   ExplicitWidth = 975
   ExplicitHeight = 587
@@ -57,6 +59,10 @@ inherited frmMain: TfrmMain
     object tsSQLMonitor: TcxTabSheet
       Caption = #1052#1086#1085#1080#1090#1086#1088#1080#1085#1075' '#1079#1072#1087#1088#1086#1089#1086#1074
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
     end
   end
   inherited sknMain: TdxSkinController

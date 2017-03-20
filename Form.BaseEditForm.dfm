@@ -3,6 +3,8 @@ inherited frmBaseEditor: TfrmBaseEditor
   Caption = 'frmBaseEditor'
   ClientHeight = 278
   ClientWidth = 632
+  KeyPreview = True
+  OnKeyDown = FormKeyDown
   ExplicitWidth = 638
   ExplicitHeight = 306
   PixelsPerInch = 96

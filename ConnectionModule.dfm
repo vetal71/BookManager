@@ -7,6 +7,7 @@ object DM: TDM
     ProviderName = 'SQLite'
     Database = 'd:\DevProjects\BookManager\WorkLibrary.db'
     Options.KeepDesignConnected = False
+    Connected = True
     LoginPrompt = False
     Left = 32
     Top = 16
@@ -63,6 +64,7 @@ object DM: TDM
     DetailFields = 'CATEGORY_ID'
     Debug = True
     Options.RequiredFields = False
+    AfterDelete = qryBooksAfterDelete
     Left = 40
     Top = 120
     ParamData = <

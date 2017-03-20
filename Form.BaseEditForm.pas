@@ -20,6 +20,7 @@ type
     bvlBottom: TBevel;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FHeader: string;
   private
@@ -46,6 +47,15 @@ end;
 procedure TfrmBaseEditor.btnOKClick(Sender: TObject);
 begin
   ModalResult := mrOk;
+end;
+
+procedure TfrmBaseEditor.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key = 13) and (ssCtrl in Shift) then
+    btnOKClick(nil);
+  if (Key = 27) then
+    btnCancelClick(nil);
 end;
 
 function TfrmBaseEditor.GetHeader: string;

@@ -14,7 +14,7 @@ uses
 
 type
   TfrmEditBook = class(TfrmBaseEditor)
-    lblCategoryName: TcxLabel;
+    lblBookName: TcxLabel;
     lblParentCategory: TcxLabel;
     btnAddCategory: TcxButton;
     lblFileLink: TcxLabel;
@@ -23,13 +23,14 @@ type
     edtFileLink: TcxDBTextEdit;
     qryCategories: TUniQuery;
     dsCategories: TUniDataSource;
-    cbbParentCategory: TcxDBLookupComboBox;
+    cbbCategory: TcxDBLookupComboBox;
     edtFullCategory: TcxTextEdit;
     procedure btnOKClick(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
     procedure btnFileLinkClick(Sender: TObject);
     procedure btnAddCategoryClick(Sender: TObject);
     procedure cbbParentCategoryPropertiesChange(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     function GetFullCategory: string;
   public
@@ -98,7 +99,6 @@ end;
 
 procedure TfrmEditBook.cbbParentCategoryPropertiesChange(Sender: TObject);
 begin
-  inherited;
   edtFullCategory.Text := GetFullCategory;
 end;
 
@@ -119,6 +119,14 @@ begin
   end;
 end;
 
+procedure TfrmEditBook.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key = 13) and (ssCtrl in Shift) then
+    btnOKClick(nil);
+  inherited;
+end;
+
 function TfrmEditBook.GetFullCategory: string;
 const
   cSQL =
@@ -134,7 +142,7 @@ begin
   with TUniQuery.Create(nil) do try
     Connection := DM.conn;
     SQL.Text := cSQL;
-    ParamByName('ID').AsInteger := qryCategories.FieldByName('ID').AsInteger;
+    ParamByName('ID').AsInteger := cbbCategory.EditValue;
     Open;
     if not IsEmpty then
       Result := FieldValues['Path'];

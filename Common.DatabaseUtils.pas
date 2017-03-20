@@ -10,6 +10,7 @@ type
 
 function UpdateDatabaseShema(ADBFile: string): Boolean;
 procedure FillData;
+function GetFieldValue(AParams: array of Variant): Variant;
 
 implementation
 

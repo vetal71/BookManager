@@ -57,12 +57,15 @@ type
     procedure actRefreshLibraryExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure actSaveToGoogleDriveExecute(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     Connection: TUniConnection;
+    FView: TForm;
   private
     procedure ShowSqlMonitorForm;
     procedure ShowLibraryForm;
     procedure BooksDataChange(Sender: TObject; Field: TField);
+    procedure DeleteBook(DataSet: TDataSet);
   end;
 
 var
@@ -71,7 +74,7 @@ var
 implementation
 
 uses
-  Common.DatabaseUtils, Common.Utils,
+  Common.DatabaseUtils, Common.Utils, cxDBTL,
   Form.MainView, ibggdrive, ibgcore;
 
 {$R *.dfm}
@@ -112,6 +115,35 @@ begin
   sbMain.Panels[ 0 ].Text := TDataSource(Sender).DataSet.FieldByName('BookLink').AsString;
 end;
 
+procedure TfrmMain.DeleteBook(DataSet: TDataSet);
+var
+  BookCount: Integer;
+begin
+  BookCount := GetFieldValue(['count(*)','Books']);
+  sbMain.Panels[1].Text := Format('Всего книг в библиотеке: %d штук', [BookCount]);
+end;
+
+procedure TfrmMain.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key = 116) or ((Key = 13) and (ssShift in Shift)) then // F5 или Shift+Enter - запуск просмотра
+    TfrmLibraryView(FView).btnRunClick(nil);
+  if Key = 45 then begin // Ins
+    if ActiveControl is TcxDbTreeList then
+      TfrmLibraryView(FView).btnAddCategoryClick(nil)
+    else
+      TfrmLibraryView(FView).btnAddBookClick(nil);
+  end;
+  if (Key = 113) or ((Key = 13) and (ssCtrl in Shift)) then begin // F2 или Ctrl+Enter
+    if ActiveControl is TcxDbTreeList then
+      TfrmLibraryView(FView).btnEditCategoryClick(nil)
+    else
+      TfrmLibraryView(FView).btnEditBookClick(nil);
+  end;
+  if (Key = 36) and (ssCtrl in Shift) then // Ctrl+Home
+    DM.qryCategories.First;
+end;
+
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
   sbMain.Panels[2].Text := Format('База данных: %s', [DM.DBFile]);
@@ -125,10 +157,12 @@ var
   F: TfrmLibraryView;
 begin
   F := TfrmLibraryView.Create(Application);
+  FView := F;
   F.Parent := tsMainView;
   F.Align := alClient;
   F.BorderStyle := bsNone;
   DM.OnDataChange := BooksDataChange;
+  DM.OnDeleteBook := DeleteBook;
   F.Show;
   sbMain.Panels[1].Text := Format('Всего книг в библиотеке: %d штук', [F.BookCount]);
 end;
