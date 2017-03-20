@@ -6,6 +6,9 @@ uses
   System.Classes, System.SysUtils, Vcl.Forms, Winapi.Windows, Vcl.Controls,
   System.Generics.Collections, Winapi.ShellAPI, Winapi.ActiveX;
 
+const
+  cGDriveKey = 'Bearer ya29.GlsUBKDsCD6SbtcN8J9JTdMszZLjLrsHxQmnzZ6GWPXXP00ky7t5fDLEFmFO7yEnKZpe9dZsK801VBxTPNy4FAaigvRo-h3sim9EMCV5XU4A6aANYPEwfQNoIrGY';
+
 type
   TFileRecord = record
     FileName: string;

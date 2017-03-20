@@ -49,9 +49,14 @@ type
     biSQLAudit: TdxBarButton;
     bsi1: TdxBarSubItem;
     bi4: TdxBarButton;
+    bi5: TdxBarButton;
+    dxBarSeparator2: TdxBarSeparator;
+    actSaveToGoogleDrive: TAction;
+    btnSaveGDrive: TdxBarLargeButton;
     procedure actExitExecute(Sender: TObject);
     procedure actRefreshLibraryExecute(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure actSaveToGoogleDriveExecute(Sender: TObject);
   private
     Connection: TUniConnection;
   private
@@ -66,8 +71,8 @@ var
 implementation
 
 uses
-  Common.DatabaseUtils,
-  Form.MainView;
+  Common.DatabaseUtils, Common.Utils,
+  Form.MainView, ibggdrive, ibgcore;
 
 {$R *.dfm}
 
@@ -79,6 +84,26 @@ end;
 procedure TfrmMain.actRefreshLibraryExecute(Sender: TObject);
 begin
   FillData;
+end;
+
+procedure TfrmMain.actSaveToGoogleDriveExecute(Sender: TObject);
+begin
+  // сохранить в google drive
+  with TibgGDrive.Create(nil) do try
+    try
+      Screen.Cursor := crHourGlass;
+      Authorization := cGDriveKey;
+      ResourceIndex := -1;
+      LocalFile := DM.DBFile;
+      UploadFile(ExtractFileName(DM.DBFile));
+      ShowMessage('Готово!!!');
+    except on ex: EInGoogle do
+      ShowError('Ошибка сохранения файла в Google Drive: ' + ex.Message);
+    end;
+  finally
+    Screen.Cursor := crDefault;
+    Free;
+  end;
 end;
 
 procedure TfrmMain.BooksDataChange(Sender: TObject; Field: TField);

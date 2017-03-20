@@ -41,13 +41,16 @@ var
 implementation
 
 uses
-  Common.DatabaseUtils;
+  Common.DatabaseUtils, OtlParallel, System.IniFiles;
 
 {$R *.dfm}
 
 { Tdb }
 
 procedure TDM.SetDBFile(Value: string);
+var
+  vFuture: IOmniFuture<integer>;
+  SilentMode: Boolean;
 begin
   FDBFile := Value;
   // нет такой базы - создадим
@@ -58,9 +61,24 @@ begin
   conn.Database := FDBFile;
   try
     conn.Connect;
-    FillData;
+    with TIniFile.Create(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))) + 'conn.ini') do try
+    // параметр конфигурации "Тихий режим"
+      SilentMode := ReadBool('Config', 'SilentMode', False);
+    finally
+      Free;
+    end;
+    if SilentMode then begin
+      // Запускаем вычисления в параллельном потоке
+        vFuture := Parallel.Future<integer>(
+          function: integer
+          begin
+            Result := 0;
+            FillData;
+          end
+        )
+    end else FillData;
   except on E: Exception do
-    ShowErrorFmt('Ошибка подключения к базе данных %s'#13'%s', [E.Message]);
+    ShowErrorFmt('Ошибка подключения к базе данных %s'#13'%s', [FDBFile, E.Message]);
   end;
 end;
 

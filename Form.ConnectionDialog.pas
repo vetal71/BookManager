@@ -28,7 +28,7 @@ var
 implementation
 
 uses
-  System.IniFiles, synautil;
+  System.IniFiles, synautil, Common.Utils, ibggdrive, ibgcore;
 
 {$R *.dfm}
 
@@ -52,8 +52,47 @@ begin
 end;
 
 function TfrmDlgConnection.GetDBFile: string;
+var
+  DBFile, DBFileType, LocalDBFile: string;
+  I: Integer;
 begin
-  Result := SeparateRight(cbbConnections.Text, '=');
+  DBFileType := SeparateLeft(cbbConnections.Text, '=');
+  DBFile     := SeparateRight(cbbConnections.Text, '=');
+  if CompareText('GDrive', DBFileType) = 0 then begin
+    // 1. Соединяемся с Google Drive
+    // 2. Скачиваем файл БД
+    with TibgGDrive.Create(nil) do try
+      try
+        Screen.Cursor := crHourGlass;
+        Authorization := cGDriveKey;
+
+        ResourceIndex := -1;
+        ListResources();
+
+        for i := 0 to ResourceCount - 1 do begin
+          ResourceIndex := i;
+          if CompareText(DBFile, Utf8ToAnsi(ResourceTitle)) = 0 then Break;
+        end;
+
+        // резервная копия локального файла
+        LocalDBFile := ExtractFilePath(ParamStr(0)) + DBFile;
+        if FileExists(LocalDBFile) then begin
+          if not RenameFile(LocalDBFile, ChangeFileExt(LocalDBFile, '.bak')) then
+            ShowErrorFmt('Резервная копия файла базы данных не создана. Код ошибки %d', [GetLastError]);
+        end;
+
+        LocalFile := LocalDBFile;
+        DownloadFile('');
+
+      except on ex: EInGoogle do
+        ShowError('Ошибка загрузки файла из Google Drive: ' + ex.Message);
+      end;
+    finally
+      Screen.Cursor := crDefault;
+      Free;
+    end;
+  end;
+  Result := DBFile;
 end;
 
 end.

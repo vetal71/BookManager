@@ -47,34 +47,19 @@ var
 
 implementation
 
+uses
+  Vcl.FileCtrl;
+
 {$R *.dfm}
 
 procedure TForm1.btn1Click(Sender: TObject);
 var
-  UniConnection: TUniConnection;
-  UniQuery: TUniQuery;
+  StartDir: string;
 begin
-  UniConnection := TUniConnection.Create(nil);
-  try
-    UniConnection.ConnectString := 'Provider Name=SQLite;Data Source=:memory:';
-    UniConnection.Connect;
-    mmo1.Lines.Add('SQLite version: ' +  UniConnection.ClientVersion); //3.8.5
-    mmo1.Lines.Add('UniDAC Version: ' + UniDACVersion); //5.5.12
-    UniConnection.ExecSQL('create table visits(id integer, from_visit integer)');
-    UniConnection.ExecSQL('create table path(id integer, from_visit integer)');
-    UniConnection.ExecSQL('insert into visits values(27585, 1)');
-    UniConnection.ExecSQL('insert into path values(1, 1)');
-    UniQuery := TUniQuery.Create(nil);
-    try
-      UniQuery.Connection := UniConnection;
-      UniQuery.SQL.Text := 'with recursive path as (select id, from_visit from visits where visits.id=27585 union all select visits.id, visits.from_visit from path join visits on (path.from_visit = visits.id) ) select * from path';
-      UniQuery.Open;
-      mmo1.Lines.Add('Record Count: ' + IntToStr(UniQuery.RecordCount)); //1
-    finally
-      UniQuery.Free;
-    end;
-  finally
-    UniConnection.Free;
+  StartDir := 'E:\Книги';
+  if (StartDir = '') or (not DirectoryExists(StartDir)) then begin
+    // вызов диалога для выбора каталога
+    if not SelectDirectory('Выберите каталог', '', StartDir) then Exit;
   end;
 end;
 

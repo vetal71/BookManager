@@ -25,7 +25,7 @@ begin
   try
     if frmDlgConnection.ShowModal = mrOk then begin
       Application.CreateForm(TDM, DM);
-  DM.DBFile := frmDlgConnection.DBFile;
+      DM.DBFile := frmDlgConnection.DBFile;
       if not DM.ApplicationError then begin
         Application.CreateForm(TfrmMain, frmMain);
         Application.Run;

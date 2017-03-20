@@ -7,7 +7,6 @@ object DM: TDM
     ProviderName = 'SQLite'
     Database = 'd:\DevProjects\BookManager\WorkLibrary.db'
     Options.KeepDesignConnected = False
-    Connected = True
     LoginPrompt = False
     Left = 32
     Top = 16
