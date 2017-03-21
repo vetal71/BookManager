@@ -14,7 +14,7 @@ uses
   Vcl.ComCtrls, Vcl.ToolWin, Vcl.ExtCtrls, dxActivityIndicator,
   System.Generics.Collections, Uni,
   ConnectionModule,
-  cxContainer, cxTextEdit, Vcl.StdCtrls, System.Actions, Vcl.ActnList;
+  cxContainer, cxTextEdit, Vcl.StdCtrls, System.Actions, Vcl.ActnList, cxMemo;
 
 type
   TfrmLibraryView = class(TfrmBase)
@@ -41,6 +41,7 @@ type
     btnDelBook: TToolButton;
     btnRefreshBook: TToolButton;
     btnRun: TToolButton;
+    lstCategoriesCntBook: TcxDBTreeListColumn;
     procedure btnAddCategoryClick(Sender: TObject);
     procedure btnEditCategoryClick(Sender: TObject);
     procedure btnDelCategoryClick(Sender: TObject);
@@ -52,10 +53,18 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
+    procedure grdBooksViewCustomDrawCell(Sender: TcxCustomGridTableView;
+      ACanvas: TcxCanvas; AViewInfo: TcxGridTableDataCellViewInfo;
+      var ADone: Boolean);
+    procedure FormCreate(Sender: TObject);
+    procedure lstCategoriesCustomDrawDataCell(Sender: TcxCustomTreeList;
+      ACanvas: TcxCanvas; AViewInfo: TcxTreeListEditCellViewInfo;
+      var ADone: Boolean);
   private
     FBookID: Integer;
   private
     function GetBookCount: Integer;
+    procedure BooksChange(Sender: TObject);
   public
     procedure LoadData;
   public
@@ -69,6 +78,7 @@ implementation
 
 uses
   Common.Utils,
+  Common.DatabaseUtils,
   Form.EditCategory,
   Form.EditBook,
   System.IniFiles,
@@ -87,6 +97,8 @@ var
   FileName: string;
 begin
   // вызов программы-читалки
+  if not btnRun.Enabled then Exit;
+
   with dm do begin
     FileName := qryBooks.FieldByName('BookLink').AsString;
     if FileName.IsEmpty then Exit;
@@ -94,25 +106,40 @@ begin
   ShellExecute(0, '', FileName);
 end;
 
+procedure TfrmLibraryView.BooksChange(Sender: TObject);
+var
+  BookLink: string;
+begin
+  if not Assigned(Sender) then Exit;
+  BookLink := DM.qryBooks.FieldByName('BookLink').AsString;
+  btnRun.Enabled := FileExists(BookLink);
+  btnDelBook.Enabled := btnRun.Enabled;
+end;
+
 procedure TfrmLibraryView.btnAddBookClick(Sender: TObject);
 begin
   DM.qryBooks.Append;
   TfrmEditBook.Edit(emAppend);
-//  LoadData;
 end;
 
 procedure TfrmLibraryView.btnAddCategoryClick(Sender: TObject);
 begin
-  DM.qryCategories.Append;
+  with DM.qryCategories do begin
+    Append;
+    // генерим новый ID
+    FieldByName('Id').AsInteger := GetFieldValue(['max(Id)+1', 'Categories', 'Id < 1000']);
+    // по умолчанию категори€ 1
+    FieldByName('Parent_Id').AsInteger := 1;
+  end;
   TfrmEditCategory.Edit(emAppend);
-//  LoadData;
 end;
 
 procedure TfrmLibraryView.btnDelBookClick(Sender: TObject);
 var
   BookName, BookLink: string;
-
 begin
+  if not btnDelBook.Enabled then Exit;
+
   BookName := DM.qryBooks.FieldByName('BookName').asString;
   BookLink := DM.qryBooks.FieldByName('BookLink').AsString;
   if ShowConfirmFmt(rsConfirmDeleteRecord, ['книгу', BookName]) then begin
@@ -183,9 +210,15 @@ begin
   end;
 end;
 
+procedure TfrmLibraryView.FormCreate(Sender: TObject);
+begin
+  DM.RegChangeNotifier(BooksChange);
+end;
+
 procedure TfrmLibraryView.FormDestroy(Sender: TObject);
 begin
   with dm do begin
+    UnregChangeNotifier(BooksChange);
     qryCategories.Close;
     qryBooks.Close;
   end;
@@ -211,6 +244,22 @@ begin
   end;
 end;
 
+procedure TfrmLibraryView.grdBooksViewCustomDrawCell(
+  Sender: TcxCustomGridTableView; ACanvas: TcxCanvas;
+  AViewInfo: TcxGridTableDataCellViewInfo; var ADone: Boolean);
+Var
+  lTextToDraw: string;
+  lColFont: TFont;
+begin
+  lColFont := ACanvas.Font;                                                     //сохран€ем настройки шрифта по умолчанию дл€ текущей €чейки
+  lTextToDraw := trim(AViewInfo.GridRecord.DisplayTexts[ 2 ]);                  //считываем содержимое 2ого столбца
+  if ( not lTextToDraw.IsEmpty ) and ( not FileExists( lTextToDraw ) ) then begin
+    lColFont.Style := [ fsStrikeOut, fsItalic ];
+    lColFont.Color := clRed;
+  end;
+  ACanvas.Font := lColFont;                                                     //устанавливаем получившиес€ выделение дл€ всей строки
+end;
+
 procedure TfrmLibraryView.LoadData;
 begin
   with DM do begin
@@ -222,6 +271,20 @@ begin
     qryBooks.Open;
   end;
   lstCategories.FullExpand;
+end;
+
+procedure TfrmLibraryView.lstCategoriesCustomDrawDataCell(
+  Sender: TcxCustomTreeList; ACanvas: TcxCanvas;
+  AViewInfo: TcxTreeListEditCellViewInfo; var ADone: Boolean);
+var
+  lColFont: TFont;
+begin
+  lColFont := ACanvas.Font;
+  if AViewInfo.Column.ItemIndex = 2 then begin
+    lColFont.Color := clRed;
+    lColFont.Style := [ fsBold ];
+  end;
+  ACanvas.Font := lColFont;
 end;
 
 end.

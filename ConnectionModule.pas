@@ -24,19 +24,25 @@ type
     FOnSQL: TOnSQLEvent;
     FActiveMonitoring: Boolean;
     FApplicationError: Boolean;
-    FOnDataChange: TDataChangeEvent;
     FOnAfterDelete: TDataSetNotifyEvent;
+    FNotifiers: array of TNotifyEvent;
   private
     procedure SetDBFile(Value: string);
     procedure SetActiveMonitoring(Value: Boolean);
+    procedure DoBookChangeNotifier;
   public
     property DBFile: string          read FDBFile write SetDBFile;
     property OnSQLEvent: TOnSQLEvent read FOnSQL  write FOnSQL;
     property ActiveMonitoring: Boolean read FActiveMonitoring write SetActiveMonitoring;
     property ApplicationError: Boolean read FApplicationError default False;
-    property OnDataChange: TDataChangeEvent read FOnDataChange write FOnDataChange;
     property OnDeleteBook: TDataSetNotifyEvent read FOnAfterDelete write FOnAfterDelete;
+
+    // обработка подписки на события
+    procedure RegChangeNotifier(const aProc: TNotifyEvent);
+    procedure UnregChangeNotifier(const aProc: TNotifyEvent);
+    function NotifierRegistered(const aProc: TNotifyEvent): Boolean;
   end;
+
 
 var
   DM: TDM;
@@ -87,8 +93,7 @@ end;
 
 procedure TDM.BooksDataChange(Sender: TObject; Field: TField);
 begin
-  if Assigned(FOnDataChange) then
-    FOnDataChange(Sender, Field);
+  DoBookChangeNotifier;
 end;
 
 procedure TDM.DataModuleDestroy(Sender: TObject);
@@ -96,10 +101,44 @@ begin
   SQLMonitor.Active := False;
 end;
 
+procedure TDM.DoBookChangeNotifier;
+var
+  i: Integer;
+begin
+  for i := 0 to High(FNotifiers) do
+    FNotifiers[ i ](Self);
+end;
+
+function TDM.NotifierRegistered(const aProc: TNotifyEvent): Boolean;
+var
+  i: Integer;
+begin
+  // Методы объектов вполне допустимо приводить к TMethod для сравнения
+  for i := 0 to High(FNotifiers) do
+    if (TMethod(aProc).Code = TMethod(FNotifiers[i]).Code) and
+       (TMethod(aProc).Data = TMethod(FNotifiers[i]).Data) then
+    begin
+      Result := True;
+      Exit;
+    end;
+  Result := False;
+end;
+
 procedure TDM.qryBooksAfterDelete(DataSet: TDataSet);
 begin
   if Assigned(FOnAfterDelete) then
     FOnAfterDelete(DataSet);
+end;
+
+procedure TDM.RegChangeNotifier(const aProc: TNotifyEvent);
+var
+  i: Integer;
+begin
+  if NotifierRegistered(aProc) then
+    Exit;
+  i := Length(FNotifiers);
+  SetLength(FNotifiers, i + 1);
+  FNotifiers[ i ] := aProc;
 end;
 
 procedure TDM.SetActiveMonitoring(Value: Boolean);
@@ -111,6 +150,27 @@ procedure TDM.SQLMonitorSQL(Sender: TObject; Text: string; Flag: TDATraceFlag);
 begin
   if Assigned(FOnSQL) then
     FOnSQL(Sender, Text, Flag);
+end;
+
+procedure TDM.UnregChangeNotifier(const aProc: TNotifyEvent);
+var
+  i: Integer;
+  vDel: Boolean;
+begin
+ // Пользуясь фактом, что дублей обработчиков быть не может
+ //(эта проверка реализуется в RegChangeNotifier),
+ //слегка оптимизирую операцию удаления
+  vDel := False;
+  for i := 0 to High(FNotifiers) do
+    if vDel then
+      FNotifiers[i - 1] := FNotifiers[ i ]
+    else
+      if (TMethod(aProc).Code = TMethod(FNotifiers[ i ]).Code) and
+         (TMethod(aProc).Data = TMethod(FNotifiers[ i ]).Data) then
+        vDel := True;
+
+  if vDel then
+    SetLength(FNotifiers, Length(FNotifiers) - 1);
 end;
 
 end.

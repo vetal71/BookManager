@@ -14,7 +14,8 @@ uses
   ConnectionModule in 'ConnectionModule.pas' {DM: TDataModule},
   Form.EditCategory in 'Form.EditCategory.pas' {frmEditCategory},
   Form.EditBook in 'Form.EditBook.pas' {frmEditBook},
-  SplashScreenU in 'SplashScreenU.pas' {SplashForm};
+  SplashScreenU in 'SplashScreenU.pas' {SplashForm},
+  Common.GoogleAuth in 'Common.GoogleAuth.pas';
 
 {$R *.res}
 
@@ -25,7 +26,7 @@ begin
   try
     if frmDlgConnection.ShowModal = mrOk then begin
       Application.CreateForm(TDM, DM);
-      DM.DBFile := frmDlgConnection.DBFile;
+  DM.DBFile := frmDlgConnection.DBFile;
       if not DM.ApplicationError then begin
         Application.CreateForm(TfrmMain, frmMain);
         Application.Run;

@@ -71,8 +71,9 @@ inherited frmEditCategory: TfrmEditCategory
       Left = 136
       Top = 15
       Anchors = [akLeft, akTop, akRight]
-      DataBinding.DataField = 'CategoryName'
+      DataBinding.DataField = 'categoryname'
       DataBinding.DataSource = DM.dsCategories
+      Properties.ReadOnly = False
       TabOrder = 2
       Width = 400
     end
@@ -90,6 +91,7 @@ inherited frmEditCategory: TfrmEditCategory
           FieldName = 'CategoryName'
         end>
       Properties.ListSource = dsCategories
+      Properties.ReadOnly = False
       TabOrder = 3
       Width = 325
     end

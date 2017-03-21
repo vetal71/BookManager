@@ -2,6 +2,8 @@ inherited frmLibraryView: TfrmLibraryView
   Caption = #1041#1080#1073#1083#1080#1086#1090#1077#1082#1072
   ClientHeight = 615
   ClientWidth = 1135
+  ShowHint = True
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   ExplicitWidth = 1151
@@ -36,6 +38,7 @@ inherited frmLibraryView: TfrmLibraryView
       object btnEditCategory: TToolButton
         Left = 23
         Top = 0
+        Hint = #1048#1079#1084#1077#1085#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
         Caption = #1048#1079#1084#1077#1085#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
         ImageIndex = 2
         OnClick = btnEditCategoryClick
@@ -43,7 +46,7 @@ inherited frmLibraryView: TfrmLibraryView
       object btnDelCategory: TToolButton
         Left = 46
         Top = 0
-        Hint = #1059#1076#1072#1083#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
+        Hint = #1059#1076#1072#1083#1080#1090#1100' '#1079#1072#1087#1080#1089#1100' (Shift+Del)'
         Caption = 'btnDelCategory'
         ImageIndex = 1
         OnClick = btnDelCategoryClick
@@ -51,6 +54,7 @@ inherited frmLibraryView: TfrmLibraryView
       object btnRefresh: TToolButton
         Left = 69
         Top = 0
+        Hint = #1054#1073#1085#1086#1074#1080#1090#1100' '#1087#1088#1077#1076#1089#1090#1072#1074#1083#1077#1085#1080#1077
         Caption = 'btnRefreshCategory'
         ImageIndex = 3
         OnClick = btnRefreshClick
@@ -67,8 +71,8 @@ inherited frmLibraryView: TfrmLibraryView
         item
         end>
       DataController.DataSource = DM.dsCategories
-      DataController.ParentField = 'PARENT_ID'
-      DataController.KeyField = 'ID'
+      DataController.ParentField = 'parent_id'
+      DataController.KeyField = 'id'
       Navigator.Buttons.CustomButtons = <>
       OptionsBehavior.ExpandOnDblClick = False
       OptionsBehavior.IncSearch = True
@@ -78,12 +82,13 @@ inherited frmLibraryView: TfrmLibraryView
       OptionsView.ColumnAutoWidth = True
       RootValue = -1
       TabOrder = 1
+      OnCustomDrawDataCell = lstCategoriesCustomDrawDataCell
       OnDblClick = btnEditCategoryClick
       object lstCategoriesCategoryID: TcxDBTreeListColumn
         Caption.AlignHorz = taCenter
         Caption.Text = #1050#1086#1076
-        DataBinding.FieldName = 'ID'
-        Width = 80
+        DataBinding.FieldName = 'id'
+        Width = 68
         Position.ColIndex = 0
         Position.RowIndex = 0
         Position.BandIndex = 0
@@ -93,9 +98,20 @@ inherited frmLibraryView: TfrmLibraryView
       object lstCategoriesCategoryName: TcxDBTreeListColumn
         Caption.AlignHorz = taCenter
         Caption.Text = #1050#1072#1090#1077#1075#1086#1088#1080#1103
-        DataBinding.FieldName = 'CategoryName'
-        Width = 336
+        DataBinding.FieldName = 'categoryname'
+        Width = 307
         Position.ColIndex = 1
+        Position.RowIndex = 0
+        Position.BandIndex = 0
+        Summary.FooterSummaryItems = <>
+        Summary.GroupFooterSummaryItems = <>
+      end
+      object lstCategoriesCntBook: TcxDBTreeListColumn
+        Caption.AlignHorz = taCenter
+        Caption.Text = #1042#1089#1077#1075#1086
+        DataBinding.FieldName = 'cnt_book'
+        Width = 64
+        Position.ColIndex = 2
         Position.RowIndex = 0
         Position.BandIndex = 0
         Summary.FooterSummaryItems = <>
@@ -126,12 +142,13 @@ inherited frmLibraryView: TfrmLibraryView
       Align = alClient
       TabOrder = 0
       object grdBooksView: TcxGridDBTableView
-        OnDblClick = btnEditBookClick
+        OnDblClick = btnRunClick
         Navigator.Buttons.CustomButtons = <>
         FindPanel.DisplayMode = fpdmAlways
         FindPanel.FocusViewOnApplyFilter = True
         FindPanel.InfoText = #1042#1074#1077#1076#1080#1090#1077' '#1090#1077#1082#1089#1090' '#1076#1083#1103' '#1087#1086#1080#1089#1082#1072'...'
         FindPanel.UseExtendedSyntax = True
+        OnCustomDrawCell = grdBooksViewCustomDrawCell
         DataController.DataSource = DM.Books
         DataController.Summary.DefaultGroupSummaryItems = <>
         DataController.Summary.FooterSummaryItems = <>
@@ -189,7 +206,7 @@ inherited frmLibraryView: TfrmLibraryView
       object btnAddBook: TToolButton
         Left = 0
         Top = 0
-        Hint = #1044#1086#1073#1072#1074#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
+        Hint = #1044#1086#1073#1072#1074#1080#1090#1100' '#1079#1072#1087#1080#1089#1100' (Ins)'
         Caption = 'btnAdd'
         ImageIndex = 0
         OnClick = btnAddBookClick
@@ -197,6 +214,7 @@ inherited frmLibraryView: TfrmLibraryView
       object btnEditBook: TToolButton
         Left = 23
         Top = 0
+        Hint = #1048#1079#1084#1077#1085#1080#1090#1100' '#1079#1072#1087#1080#1089#1100' (F2 '#1080#1083#1080' Ctrl+Enter)'
         Caption = #1048#1079#1084#1077#1085#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
         ImageIndex = 2
         OnClick = btnEditBookClick
@@ -204,7 +222,7 @@ inherited frmLibraryView: TfrmLibraryView
       object btnDelBook: TToolButton
         Left = 46
         Top = 0
-        Hint = #1059#1076#1072#1083#1080#1090#1100' '#1079#1072#1087#1080#1089#1100
+        Hint = #1059#1076#1072#1083#1080#1090#1100' '#1079#1072#1087#1080#1089#1100' (Shift+Del)'
         Caption = 'btnDel'
         ImageIndex = 1
         OnClick = btnDelBookClick
@@ -212,6 +230,7 @@ inherited frmLibraryView: TfrmLibraryView
       object btnRefreshBook: TToolButton
         Left = 69
         Top = 0
+        Hint = #1054#1073#1085#1086#1074#1080#1090#1100' '#1087#1088#1077#1076#1089#1090#1072#1074#1083#1077#1085#1080#1077
         Caption = 'btnRefreshBook'
         ImageIndex = 3
         OnClick = btnRefreshBookClick
@@ -219,6 +238,7 @@ inherited frmLibraryView: TfrmLibraryView
       object btnRun: TToolButton
         Left = 92
         Top = 0
+        Hint = #1055#1088#1086#1089#1084#1086#1090#1088' '#1082#1085#1080#1075#1080' (F5 '#1080#1083#1080' Shift+Enter)'
         Caption = 'btnRun'
         ImageIndex = 4
         OnClick = btnRunClick

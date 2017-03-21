@@ -5,10 +5,12 @@ inherited frmMain: TfrmMain
   KeyPreview = True
   ShowHint = True
   WindowState = wsMaximized
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   ExplicitWidth = 975
-  ExplicitHeight = 588
+  ExplicitHeight = 587
   PixelsPerInch = 96
   TextHeight = 20
   object sbMain: TdxStatusBar [0]

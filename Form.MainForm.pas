@@ -58,13 +58,15 @@ type
     procedure FormShow(Sender: TObject);
     procedure actSaveToGoogleDriveExecute(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     Connection: TUniConnection;
     FView: TForm;
   private
     procedure ShowSqlMonitorForm;
     procedure ShowLibraryForm;
-    procedure BooksDataChange(Sender: TObject; Field: TField);
+    procedure BooksChange(Sender: TObject);
     procedure DeleteBook(DataSet: TDataSet);
   end;
 
@@ -75,7 +77,7 @@ implementation
 
 uses
   Common.DatabaseUtils, Common.Utils, cxDBTL,
-  Form.MainView, ibggdrive, ibgcore;
+  Form.MainView, Common.GoogleAuth;
 
 {$R *.dfm}
 
@@ -92,27 +94,22 @@ end;
 procedure TfrmMain.actSaveToGoogleDriveExecute(Sender: TObject);
 begin
   // сохранить в google drive
-  with TibgGDrive.Create(nil) do try
-    try
-      Screen.Cursor := crHourGlass;
-      Authorization := cGDriveKey;
-      ResourceIndex := -1;
-      LocalFile := DM.DBFile;
-      UploadFile(ExtractFileName(DM.DBFile));
-      ShowInfo('Файл базы данных успешно сохранен в Google Drive.');
-    except on ex: EInGoogle do
-      ShowError('Ошибка сохранения файла в Google Drive: ' + ex.Message);
-    end;
+  Screen.Cursor := crHourGlass;
+  try
+    TGoogleAuth.UploadFile(ExtractFilePath(ParamStr(0)) + DM.DBFile);
   finally
     Screen.Cursor := crDefault;
-    Free;
   end;
 end;
 
-procedure TfrmMain.BooksDataChange(Sender: TObject; Field: TField);
+procedure TfrmMain.BooksChange(Sender: TObject);
+var
+  BookLink: string;
 begin
   if not Assigned(Sender) then Exit;
-  sbMain.Panels[ 0 ].Text := TDataSource(Sender).DataSet.FieldByName('BookLink').AsString;
+
+  BookLink := DM.qryBooks.FieldByName('BookLink').AsString;
+  sbMain.Panels[ 0 ].Text := BookLink;
 end;
 
 procedure TfrmMain.DeleteBook(DataSet: TDataSet);
@@ -123,11 +120,22 @@ begin
   sbMain.Panels[1].Text := Format('Всего книг в библиотеке: %d штук', [BookCount]);
 end;
 
+procedure TfrmMain.FormCreate(Sender: TObject);
+begin
+  DM.RegChangeNotifier(BooksChange);
+end;
+
+procedure TfrmMain.FormDestroy(Sender: TObject);
+begin
+  DM.UnregChangeNotifier(BooksChange);
+end;
+
 procedure TfrmMain.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (Key = 116) or ((Key = 13) and (ssShift in Shift)) then // F5 или Shift+Enter - запуск просмотра
     TfrmLibraryView(FView).btnRunClick(nil);
+
   if Key = 45 then begin // Ins
     if ActiveControl is TcxDbTreeList then
       TfrmLibraryView(FView).btnAddCategoryClick(nil)
@@ -142,6 +150,12 @@ begin
   end;
   if (Key = 36) and (ssCtrl in Shift) then // Ctrl+Home
     DM.qryCategories.First;
+  if (Key = 46) and (ssShift in Shift) then begin
+    if ActiveControl is TcxDbTreeList then
+      TfrmLibraryView(FView).btnDelCategoryClick(nil)
+    else
+      TfrmLibraryView(FView).btnDelBookClick(nil);
+  end;
 end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
@@ -161,7 +175,6 @@ begin
   F.Parent := tsMainView;
   F.Align := alClient;
   F.BorderStyle := bsNone;
-  DM.OnDataChange := BooksDataChange;
   DM.OnDeleteBook := DeleteBook;
   F.Show;
   sbMain.Panels[1].Text := Format('Всего книг в библиотеке: %d штук', [F.BookCount]);

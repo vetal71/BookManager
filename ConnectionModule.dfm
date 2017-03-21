@@ -7,7 +7,6 @@ object DM: TDM
     ProviderName = 'SQLite'
     Database = 'd:\DevProjects\BookManager\WorkLibrary.db'
     Options.KeepDesignConnected = False
-    Connected = True
     LoginPrompt = False
     Left = 32
     Top = 16
@@ -82,32 +81,45 @@ object DM: TDM
   object qryCategories: TUniQuery
     KeyFields = 'ID'
     SQLInsert.Strings = (
-      'INSERT INTO Categories'
+      'INSERT INTO categories'
       '  (ID, CATEGORYNAME, PARENT_ID)'
       'VALUES'
       '  (:ID, :CATEGORYNAME, :PARENT_ID)')
     SQLDelete.Strings = (
-      'DELETE FROM Categories'
+      'DELETE FROM categories'
       'WHERE'
       '  ID = :Old_ID')
     SQLUpdate.Strings = (
-      'UPDATE Categories'
+      'UPDATE categories'
       'SET'
       '  ID = :ID, CATEGORYNAME = :CATEGORYNAME, PARENT_ID = :PARENT_ID'
       'WHERE'
       '  ID = :Old_ID')
     SQLRefresh.Strings = (
-      'SELECT ID, CATEGORYNAME, PARENT_ID FROM Categories'
+      'select '
+      '  c.id, '
+      '  c.categoryname, '
+      '  c.parent_id, '
+      
+        '  (select count(*) from books b where b.category_id = c.id) as c' +
+        'nt_book '
+      'from categories c'
       'WHERE'
       '  ID = :ID')
     SQLRecCount.Strings = (
-      'SELECT count(*) FROM (SELECT * FROM Categories'
+      'SELECT count(*) FROM (SELECT * FROM categories'
       ')')
     Connection = conn
     SQL.Strings = (
-      'select * from Categories'
+      'select '
+      '  c.id, '
+      '  c.categoryname, '
+      '  c.parent_id, '
+      
+        '  (select count(*) from books b where b.category_id = c.id) as c' +
+        'nt_book '
+      'from categories c '
       'order by id')
-    Debug = True
     Options.RequiredFields = False
     Left = 40
     Top = 184
