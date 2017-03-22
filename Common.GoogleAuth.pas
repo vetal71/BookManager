@@ -14,8 +14,10 @@ const
     'Bearer ya29.GlsUBAgw23z37pHrliQjH2ro0s59haDvLW42E0qjQ6sfh_eMPb2hzkiOOrlbamiBv6EFPmhG-j4QREM6SRzCZElLUdh61NlHPZKo6-bO-11_Oi0LbbBE3XEEaWj-'
   );
 
-  cClientID           = '157623334268-pdch1uarb3180t5hq2s16ash9ei315j0.apps.googleusercontent.com';
-  cClientSecret       = 'k4NSk71U-p2sU8lB8Qv3G24R';
+  cClientID           = {'157623334268-pdch1uarb3180t5hq2s16ash9ei315j0.apps.googleusercontent.com';}
+                        '496929878224-n96vi711iu5buhki7m6p3r8ne5n14j66.apps.googleusercontent.com';
+  cClientSecret       = {'k4NSk71U-p2sU8lB8Qv3G24R';}
+                        'IbmtJrRD2GfJE6BKkAmGNFci';
   cServerAuthURL      = 'https://accounts.google.com/o/oauth2/auth';
   cServerTokenURL     = 'https://accounts.google.com/o/oauth2/token';
   cAuthorizationScope = 'https://www.googleapis.com/auth/drive';
