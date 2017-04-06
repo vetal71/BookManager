@@ -75,6 +75,7 @@ object DM: TDM
   end
   object dsCategories: TUniDataSource
     DataSet = qryCategories
+    OnDataChange = dsCategoriesDataChange
     Left = 110
     Top = 184
   end
@@ -115,9 +116,10 @@ object DM: TDM
       '  c.id, '
       '  c.categoryname, '
       '  c.parent_id, '
-      
-        '  (select count(*) from books b where b.category_id = c.id) as c' +
-        'nt_book '
+      '  case c.id'
+      '  when 1 then (select count(*) from books b)'
+      '  else (select count(*) from books b where b.category_id = c.id)'
+      '  end as cnt_book '
       'from categories c '
       'order by id')
     Options.RequiredFields = False

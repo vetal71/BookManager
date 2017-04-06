@@ -19,6 +19,7 @@ type
     procedure BooksDataChange(Sender: TObject; Field: TField);
     procedure DataModuleDestroy(Sender: TObject);
     procedure qryBooksAfterDelete(DataSet: TDataSet);
+    procedure dsCategoriesDataChange(Sender: TObject; Field: TField);
   private
     FDBFile: string;
     FOnSQL: TOnSQLEvent;
@@ -50,7 +51,9 @@ var
 implementation
 
 uses
-  Common.DatabaseUtils, OtlParallel, System.IniFiles;
+  Common.DatabaseUtils,
+  OtlParallel,
+  System.IniFiles;
 
 {$R *.dfm}
 
@@ -78,13 +81,13 @@ begin
     end;
     if SilentMode then begin
       // Запускаем вычисления в параллельном потоке
-        vFuture := Parallel.Future<integer>(
-          function: integer
-          begin
-            Result := 0;
-            FillData;
-          end
-        )
+      vFuture := Parallel.Future<integer>(
+        function: integer
+        begin
+          Result := 0;
+          FillData;
+        end
+      )
     end else FillData;
   except on E: Exception do
     ShowErrorFmt('Ошибка подключения к базе данных %s'#13'%s', [FDBFile, E.Message]);
@@ -107,6 +110,19 @@ var
 begin
   for i := 0 to High(FNotifiers) do
     FNotifiers[ i ](Self);
+end;
+
+procedure TDM.dsCategoriesDataChange(Sender: TObject; Field: TField);
+begin
+  // Для категории 1 - Все книги Master := nil
+  if qryCategories.FieldValues['ID'] = 1 then begin
+    qryBooks.MasterSource := nil;
+  end else begin
+    qryBooks.MasterSource := dsCategories;
+    qryBooks.MasterFields := 'ID';
+    qryBooks.DetailFields := 'CATEGORY_ID';
+    qryBooks.KeyFields    := 'ID';
+  end;
 end;
 
 function TDM.NotifierRegistered(const aProc: TNotifyEvent): Boolean;
